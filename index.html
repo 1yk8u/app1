@@ -3,532 +3,828 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>开源应用 · 下载中心</title>
+<title>流光开源 · 应用中心</title>
 <style>
+  :root {
+    --bg: #05070f; --panel: rgba(255,255,255,.05); --panel-strong: rgba(13,16,30,.92);
+    --line: rgba(255,255,255,.10); --line-strong: rgba(165,180,252,.38);
+    --txt: #eef1fa; --txt-2: #a6afc9; --txt-3: #74809f;
+    --ac1: #6366f1; --ac2: #8b5cf6; --ac3: #d946ef; --ok: #34d399; --bad: #f87171;
+    --r-lg: 24px; --r-md: 16px;
+  }
   * { margin:0; padding:0; box-sizing:border-box; }
-  html,body { height:100%; }
+  html { scroll-behavior:smooth; }
   body {
-    font-family:"Microsoft YaHei",system-ui,-apple-system,sans-serif;
-    background:#0b0d17; color:#e8ebf5; min-height:100vh;
-    display:flex; flex-direction:column; align-items:center;
-    padding:48px 20px 60px;
+    font-family:"Segoe UI",system-ui,-apple-system,"Microsoft YaHei",sans-serif;
+    background:var(--bg); color:var(--txt); min-height:100vh;
     background-image:
-      radial-gradient(600px 400px at 15% 0%, rgba(99,102,241,.22), transparent 70%),
-      radial-gradient(700px 450px at 90% 10%, rgba(236,72,153,.16), transparent 70%),
-      radial-gradient(500px 500px at 50% 100%, rgba(34,211,238,.12), transparent 70%);
+      radial-gradient(900px 520px at 12% -6%, rgba(99,102,241,.20), transparent 68%),
+      radial-gradient(800px 500px at 88% 4%, rgba(217,70,239,.13), transparent 68%),
+      radial-gradient(760px 560px at 50% 108%, rgba(34,211,238,.10), transparent 70%);
     background-attachment:fixed;
+    -webkit-font-smoothing:antialiased;
   }
+  ::selection { background:rgba(139,92,246,.45); }
+
+  /* ─────────── 顶栏 ─────────── */
+  .topbar {
+    position:sticky; top:0; z-index:100;
+    display:flex; align-items:center; gap:18px;
+    padding:14px clamp(18px,4vw,42px);
+    background:rgba(5,7,15,.72); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+    border-bottom:1px solid var(--line);
+  }
+  .brand { display:flex; align-items:center; gap:11px; font-weight:800; letter-spacing:.5px; }
+  .brand .mark {
+    width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+    font-size:17px; color:#fff;
+    background:linear-gradient(135deg,var(--ac1),var(--ac2) 55%,var(--ac3));
+    box-shadow:0 6px 18px rgba(139,92,246,.45), inset 0 1px 0 rgba(255,255,255,.35);
+  }
+  .brand small { display:block; font-size:10.5px; font-weight:600; color:var(--txt-3); letter-spacing:2px; }
+  .topnav { display:flex; gap:6px; margin-left:auto; }
+  .topnav a {
+    color:var(--txt-2); text-decoration:none; font-size:13px; font-weight:600;
+    padding:7px 14px; border-radius:999px; transition:.2s;
+  }
+  .topnav a:hover { color:#fff; background:rgba(255,255,255,.08); }
+  .topnav a.gh { border:1px solid var(--line); }
+  @media (max-width:760px){ .topnav a:not(.gh){ display:none; } }
+
+  /* ─────────── Hero ─────────── */
+  .hero { max-width:1080px; margin:0 auto; padding:64px clamp(18px,4vw,42px) 10px; text-align:center; }
+  .eyebrow {
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:12px; font-weight:700; letter-spacing:3px; color:#c7d2fe;
+    padding:7px 16px; border-radius:999px;
+    background:rgba(129,140,248,.10); border:1px solid rgba(129,140,248,.28);
+  }
+  .eyebrow i { width:7px; height:7px; border-radius:50%; background:var(--ok); box-shadow:0 0 10px var(--ok); }
   h1 {
-    font-size:34px; font-weight:800; letter-spacing:1px; text-align:center;
-    background:linear-gradient(120deg,#a5b4fc,#f0abfc 55%,#67e8f9);
+    margin:22px 0 14px; font-size:clamp(34px,6vw,56px); font-weight:900; letter-spacing:1px; line-height:1.15;
+    background:linear-gradient(115deg,#c7d2fe,#f0abfc 45%,#67e8f9);
     -webkit-background-clip:text; background-clip:text; color:transparent;
   }
-  .sub { margin:10px 0 34px; color:#9aa3c0; text-align:center; font-size:15px; }
+  .hero .sub { max-width:640px; margin:0 auto; color:var(--txt-2); font-size:15.5px; line-height:1.9; }
+  .stats { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin:30px 0 8px; }
+  .stat {
+    font-size:13px; color:var(--txt-2); padding:9px 18px; border-radius:999px;
+    background:var(--panel); border:1px solid var(--line);
+  }
+  .stat b { color:#fff; font-weight:800; font-variant-numeric:tabular-nums; }
+  .searchwrap { max-width:560px; margin:26px auto 0; position:relative; }
+  .searchwrap svg { position:absolute; left:18px; top:50%; transform:translateY(-50%); opacity:.5; }
+  #q {
+    width:100%; padding:16px 88px 16px 48px; font-size:15px; color:#fff; outline:none;
+    background:rgba(255,255,255,.055); border:1px solid var(--line); border-radius:999px;
+    transition:border-color .2s, box-shadow .2s;
+  }
+  #q::placeholder { color:var(--txt-3); }
+  #q:focus { border-color:var(--line-strong); box-shadow:0 0 0 4px rgba(139,92,246,.16); }
+  .searchwrap kbd {
+    position:absolute; right:14px; top:50%; transform:translateY(-50%);
+    font-size:11px; color:var(--txt-3); border:1px solid var(--line); border-radius:8px; padding:4px 9px;
+  }
+
+  /* ─────────── 分区标题 ─────────── */
+  main { max-width:1180px; margin:0 auto; padding:0 clamp(18px,4vw,42px) 30px; }
+  .sect { padding-top:56px; }
   .secthead {
-    margin:44px 0 6px; font-size:26px; font-weight:800; letter-spacing:1px; text-align:center;
+    display:flex; align-items:center; gap:18px; margin-bottom:6px;
+    font-size:clamp(21px,3vw,27px); font-weight:900; letter-spacing:1px;
     background:linear-gradient(120deg,#67e8f9,#a5b4fc 55%,#f0abfc);
-    -webkit-background-clip:text; background-clip:text; color:transparent;
+    -webkit-background-clip:text; background-clip:text; color:transparent; white-space:nowrap;
   }
-  .sectsub { margin:0 0 30px; color:#9aa3c0; text-align:center; font-size:14px; }
-  .cards { display:flex; gap:22px; flex-wrap:wrap; justify-content:center; max-width:980px; width:100%; }
+  .secthead::before, .secthead::after { content:""; flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--line-strong)); }
+  .secthead::after { background:linear-gradient(90deg,var(--line-strong),transparent); }
+  .sectsub { text-align:center; color:var(--txt-3); font-size:13.5px; margin-bottom:30px; }
+
+  /* ─────────── 卡片 ─────────── */
+  .cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:20px; }
+  @media (max-width:420px){ .cards { grid-template-columns:1fr; } }
   .card {
-    flex:1 1 380px; max-width:460px; padding:26px 24px 24px; border-radius:22px;
-    background:rgba(255,255,255,.045);
-    border:1px solid rgba(255,255,255,.09);
-    box-shadow:0 18px 50px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.12);
+    position:relative; padding:24px 22px 22px; border-radius:var(--r-lg);
+    background:var(--panel); border:1px solid var(--line);
+    box-shadow:0 18px 50px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.09);
     backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
-    transition:transform .25s ease, border-color .25s ease;
+    transition:transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+    display:flex; flex-direction:column;
   }
-  .card:hover { transform:translateY(-4px); border-color:rgba(165,180,252,.35); }
-  .head { display:flex; align-items:center; gap:14px; margin-bottom:14px; }
+  .card::before {
+    content:""; position:absolute; inset:-1px; border-radius:inherit; padding:1px; pointer-events:none;
+    background:linear-gradient(135deg,rgba(165,180,252,.5),transparent 38%,transparent 62%,rgba(240,171,252,.4));
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+    opacity:0; transition:opacity .25s;
+  }
+  .card:hover { transform:translateY(-5px); box-shadow:0 30px 70px rgba(0,0,0,.55); }
+  .card:hover::before { opacity:1; }
+  .head { display:flex; align-items:center; gap:13px; margin-bottom:13px; }
   .logo {
-    width:56px; height:56px; border-radius:16px; display:flex; align-items:center; justify-content:center;
-    font-size:28px; flex-shrink:0;
-    background:linear-gradient(135deg,rgba(139,92,246,.5),rgba(59,130,246,.35));
-    border:1px solid rgba(255,255,255,.14);
+    width:52px; height:52px; border-radius:15px; display:flex; align-items:center; justify-content:center;
+    font-size:25px; flex-shrink:0; position:relative;
+    background:linear-gradient(135deg,var(--a,rgba(139,92,246,.55)),var(--b,rgba(59,130,246,.4)));
+    border:1px solid rgba(255,255,255,.16);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.28), 0 8px 20px rgba(0,0,0,.35);
   }
-  .title { font-size:20px; font-weight:700; }
-  .meta { font-size:13px; color:#8f9ab9; margin-top:4px; }
-  .desc { font-size:14px; line-height:1.75; color:#c3cade; margin-bottom:18px; }
-  .chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+  .title { font-size:18.5px; font-weight:800; display:flex; align-items:center; gap:9px; flex-wrap:wrap; }
+  .badge-new {
+    display:inline-flex; align-items:center; gap:5px;
+    font-size:10px; font-weight:800; letter-spacing:1.5px; color:#86efac;
+    background:rgba(34,197,94,.13); border:1px solid rgba(34,197,94,.4);
+    padding:2.5px 9px; border-radius:999px;
+  }
+  .badge-new i { width:5px; height:5px; border-radius:50%; background:var(--ok); animation:pulse 1.6s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+  .meta { font-size:12px; color:var(--txt-3); margin-top:4px; font-variant-numeric:tabular-nums; }
+  .meta code { font-family:ui-monospace,Consolas,monospace; color:#93a4d6; }
+  .desc { font-size:13.5px; line-height:1.8; color:#c3cade; margin-bottom:15px; flex:1; }
+  .chips { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:18px; }
   .chip {
-    font-size:12px; padding:4px 11px; border-radius:999px; color:#c7d2fe;
-    background:rgba(129,140,248,.12); border:1px solid rgba(129,140,248,.25);
+    font-size:11.5px; padding:4px 11px; border-radius:999px; color:#c7d2fe;
+    background:rgba(129,140,248,.10); border:1px solid rgba(129,140,248,.24); font-weight:600;
   }
-  .btn-row { display:flex; gap:12px; }
+  .btn-row { display:flex; gap:11px; margin-top:auto; }
   .btn {
-    flex:1; text-align:center; padding:13px 0; border-radius:14px; text-decoration:none;
-    font-size:15px; font-weight:700; transition:filter .2s ease, transform .2s ease;
-    display:inline-block;
+    position:relative; flex:1; text-align:center; padding:12.5px 0; border-radius:13px; text-decoration:none;
+    font-size:14.5px; font-weight:800; overflow:hidden; display:inline-block;
+    transition:filter .2s ease, transform .2s ease;
   }
-  .btn:hover { filter:brightness(1.15); transform:translateY(-1px); }
-  .btn.primary {
-    color:#fff;
-    background:linear-gradient(135deg,#6366f1,#8b5cf6 60%,#d946ef);
-    box-shadow:0 10px 26px rgba(139,92,246,.38);
+  .btn:hover { filter:brightness(1.14); transform:translateY(-1px); }
+  .btn.primary { color:#fff; background:linear-gradient(135deg,var(--ac1),var(--ac2) 58%,var(--ac3)); box-shadow:0 10px 26px rgba(139,92,246,.36); }
+  .btn.primary::after {
+    content:""; position:absolute; top:0; left:-70%; width:45%; height:100%; transform:skewX(-22deg);
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.34),transparent);
+    transition:left .45s ease;
   }
-  .btn.ghost {
-    color:#cbd5ff; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.13);
+  .btn.primary:hover::after { left:130%; }
+  .btn.ghost { color:#cbd5ff; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.14); }
+  .note { font-size:11.5px; color:var(--txt-3); margin-top:10px; }
+  .noresult { text-align:center; color:var(--txt-3); padding:60px 0 20px; font-size:14.5px; display:none; }
+
+  footer {
+    margin-top:70px; padding:26px 20px 40px; border-top:1px solid var(--line);
+    display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; align-items:center;
+    max-width:1180px; margin-inline:auto; font-size:12px; color:var(--txt-3);
   }
-  .qrbox {
-    margin-top:40px; padding:24px 28px; border-radius:22px; text-align:center;
-    background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.09);
-    max-width:520px; width:100%;
+  footer .fbrand { display:flex; align-items:center; gap:8px; font-weight:700; color:var(--txt-2); }
+  footer .fbrand .mark { width:20px; height:20px; border-radius:6px; font-size:11px; display:flex; align-items:center; justify-content:center; color:#fff; background:linear-gradient(135deg,var(--ac1),var(--ac3)); }
+
+  /* ─────────── 人机验证弹窗 ─────────── */
+  .cap-mask {
+    position:fixed; inset:0; z-index:9999;
+    background:rgba(4,6,13,.78); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    display:flex; align-items:center; justify-content:center; padding:20px;
+    transition:opacity .4s ease;
   }
-  .qrbox h3 { font-size:17px; margin-bottom:6px; }
-  .qrbox p.tip { font-size:13px; color:#8f9ab9; margin-bottom:16px; }
-  #qr { display:inline-flex; padding:12px; background:#fff; border-radius:14px; }
-  #url { margin-top:14px; font-size:14px; color:#67e8f9; word-break:break-all; }
-  .steps { margin-top:34px; max-width:980px; width:100%; }
-  .steps h3 { font-size:15px; color:#9aa3c0; margin-bottom:12px; font-weight:600; }
-  .stepgrid { display:flex; gap:14px; flex-wrap:wrap; }
-  .step {
-    flex:1 1 240px; min-width:220px; padding:16px 18px; border-radius:16px;
-    background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.07);
-    font-size:14px; color:#c3cade; line-height:1.7;
+  .cap-mask.hidden { opacity:0; pointer-events:none; }
+  body.cap-lock { overflow:hidden; }
+  .cap-panel {
+    width:342px; max-width:94vw; padding:20px 18px 16px; border-radius:22px;
+    background:var(--panel-strong); border:1px solid var(--line);
+    box-shadow:0 30px 80px rgba(0,0,0,.6);
   }
-  .step b { color:#e8ebf5; }
-  footer { margin-top:44px; font-size:12px; color:#6b7494; text-align:center; }
+  .cap-panel h3 { font-size:16px; margin-bottom:4px; }
+  .cap-sub { font-size:12.5px; color:var(--txt-3); margin-bottom:12px; line-height:1.6; }
+  .cap-canvas-wrap { position:relative; border-radius:14px; overflow:hidden; border:1px solid var(--line); }
+  .cap-canvas-wrap canvas { display:block; }
+  .cap-shake { animation:capShake .4s; }
+  @keyframes capShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+  .cap-track {
+    position:relative; margin-top:14px; height:42px; border-radius:999px;
+    background:rgba(255,255,255,.06); border:1px solid var(--line); overflow:hidden;
+  }
+  .cap-fill { position:absolute; inset:0; width:0; background:linear-gradient(90deg,rgba(99,102,241,.35),rgba(139,92,246,.5)); }
+  .cap-fill.ok { background:linear-gradient(90deg,rgba(34,197,94,.45),rgba(34,197,94,.7)); }
+  .cap-thumb {
+    position:absolute; top:3px; left:3px; width:36px; height:36px; border-radius:999px;
+    background:linear-gradient(135deg,var(--ac1),var(--ac2));
+    display:flex; align-items:center; justify-content:center; color:#fff; font-size:15px;
+    cursor:grab; touch-action:none; user-select:none; box-shadow:0 6px 16px rgba(0,0,0,.4);
+  }
+  .cap-thumb.ok { background:linear-gradient(135deg,#22c55e,#16a34a); cursor:default; }
+  .cap-hint {
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-size:12.5px; color:var(--txt-2); pointer-events:none;
+  }
+  .cap-hint.hide { display:none; }
+  .cap-status { margin-top:10px; font-size:12.5px; min-height:18px; text-align:center; }
+  .cap-status.ok { color:var(--ok); }
+  .cap-status.bad { color:var(--bad); }
+
+  @media (prefers-reduced-motion:reduce) {
+    * { animation:none !important; transition:none !important; }
+    html { scroll-behavior:auto; }
+  }
 </style>
 </head>
 <body>
+
+<nav class="topbar">
+  <div class="brand">
+    <div class="mark">流</div>
+    <div>流光开源<small>LIUGUANG OPEN SOURCE</small></div>
+  </div>
+  <div class="topnav">
+    <a href="#featured">精选应用</a>
+    <a href="#store">装机商店</a>
+    <a href="#cross">跨平台容器</a>
+    <a class="gh" href="https://github.com/1yk8u">GitHub ↗</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <span class="eyebrow"><i></i>OPEN SOURCE CENTRE · 全部免费</span>
   <h1>开源应用 · 下载中心</h1>
-  <div class="sub">全免费开源 · 大文件走 Release · 手机扫下方二维码直达</div>
-
-  <div class="cards">
-    <div class="card">
-      <div class="head">
-        <div class="logo">🎵</div>
-        <div>
-          <div class="title">流光音乐</div>
-          <div class="meta">v1.0 · 18 MB · Android 8.0+ · 备案 2026.10.18</div>
-        </div>
-      </div>
-      <div class="desc">液态玻璃质感的多源在线音乐播放器：搜索、收藏、歌单、播放页一应俱全，原生 Kotlin + Jetpack Compose 打造，动效细腻。</div>
-      <div class="chips">
-        <span class="chip">Kotlin / Compose</span><span class="chip">Media3 内核</span><span class="chip">lite 轻量</span>
-      </div>
-      <div class="btn-row">
-        <a class="btn primary" href="apks/liuguang-music-v1.0.apk">⬇ 下载 APK</a>
-        <a class="btn ghost" href="apks/liuguang-music-v1.0.apk" download="流光音乐-v1.0.apk">另存为</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="head">
-        <div class="logo">🌐</div>
-        <div>
-          <div class="title">AlistApp</div>
-          <div class="meta">v1.0 · 172.6 MB · Android 8.0+ · 内核 alist 3.65.0</div>
-        </div>
-      </div>
-      <div class="desc">手机自建私人网盘：内置官方 alist 内核，支持阿里/百度/夸克/123/OneDrive/GitHub 等全存储驱动，直链下载、直链分享、WebDAV 全制式。</div>
-      <div class="chips">
-        <span class="chip">AGPL-3.0 开源</span><span class="chip">官方内核</span><span class="chip">WebDAV</span><span class="chip">直链分享</span>
-      </div>
-      <div class="btn-row">
-        <a class="btn primary" href="https://github.com/1yk8u/app1/releases/download/v1.0/AlistApp-v1.0.apk">⬇ 下载 APK</a>
-        <a class="btn ghost" href="https://github.com/1yk8u/app1/releases/tag/v1.0">版本说明</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="head">
-        <div class="logo">🎨</div>
-        <div>
-          <div class="title">流光主题</div>
-          <div class="meta">v1.1.0 · 16 MB · Android 7.0+ · GPL-3.0 开源</div>
-        </div>
-      </div>
-      <div class="desc">华为/荣耀(EMUI·HarmonyOS 4.x·MagicOS)主题库客户端：大图卡片浏览、标签筛选、精品横幅、在线主题库（新增主题无需发版）、.hwt/.hnt 一键导入。基于 GPL-3.0 开源项目 FanChen-Theme-Library 完全重构，永久免费。</div>
-      <div class="chips">
-        <span class="chip">GPL-3.0</span><span class="chip">Compose 原生</span><span class="chip">全新品牌</span><span class="chip">永久免费</span>
-      </div>
-      <div class="btn-row">
-        <a class="btn primary" href="apks/liuguang-theme-v1.1.apk">⬇ 下载 APK</a>
-        <a class="btn ghost" href="https://github.com/1yk8u/liuguang-theme">开源源码</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="head">
-        <div class="logo">🤖</div>
-        <div>
-          <div class="title">Visual Code Space</div>
-          <div class="meta">v2.0.1 · 31 MB · Android 8.0+ · GPL-3.0</div>
-        </div>
-      </div>
-      <div class="desc">手机上的现代 AI 编程编辑器：多语言高亮补全、内置 AI 助手对话、文件管理与插件生态，随时随地写代码。（本页直存上游官方 v2.0.1 原包）</div>
-      <div class="chips">
-        <span class="chip">GPL-3.0 开源</span><span class="chip">内置 AI</span><span class="chip">688★</span><span class="chip">轻量</span>
-      </div>
-      <div class="btn-row">
-        <a class="btn primary" href="apks/vcs-v2.0.1.apk">⬇ 下载 APK</a>
-        <a class="btn ghost" href="https://github.com/Visual-Code-Space/Visual-Code-Space">上游仓库</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="head">
-        <div class="logo">🛰️</div>
-        <div>
-          <div class="title">Mobile Harness</div>
-          <div class="meta">v1.0.7 · 85 MB · Android 9.0+ · MIT</div>
-        </div>
-      </div>
-      <div class="desc">"Claude Code on Android"：把 Claude 级 AI 编程能力装进口袋。此为在线版（连接你自己的 Claude / LLM 账号）；另有 848 MB 内置模型离线版，请到上游 Releases 获取。</div>
-      <div class="chips">
-        <span class="chip">MIT 许可</span><span class="chip">Claude 级 AI</span><span class="chip">640★</span><span class="chip">BYOK</span>
-      </div>
-      <div class="btn-row">
-        <a class="btn primary" href="apks/mobile-harness-online-v1.0.7.apk">⬇ 下载 APK</a>
-        <a class="btn ghost" href="https://github.com/techjarves/Mobile-Harness/releases">离线版/上游</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="head">
-        <div class="logo">🐧</div>
-        <div>
-          <div class="title">AidLearning (AidLux)</div>
-          <div class="meta">v2.1.0 · 1.47 GB · 上游直链 · 开源</div>
-        </div>
-      </div>
-      <div class="desc">安卓上的 Linux + Python + AI 开发平台：手机跑 Linux 容器、深度学习环境与图形界面，AIOT 全家桶。体量大，本页提供上游官方直链，不重复托管。</div>
-      <div class="chips">
-        <span class="chip">5814★</span><span class="chip">Linux on Android</span><span class="chip">AI/Python</span>
-      </div>
-      <div class="btn-row">
-        <a class="btn primary" href="https://github.com/aidlearning/AidLearning-FrameWork/releases/download/V2.1.0/aidlux_2.1.0_latest_release.apk">⬇ 上游直链下载</a>
-        <a class="btn ghost" href="https://github.com/aidlearning/AidLearning-FrameWork">上游仓库</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="head">
-        <div class="logo">🐱</div>
-        <div>
-          <div class="title">主题猫</div>
-          <div class="meta">v10.22 · 20 MB · Android 7.0+ · 官方原版</div>
-        </div>
-      </div>
-      <div class="desc">华为/荣耀主题库聚合客户端。官方原版直存：未修改、未破解，内容与功能由官方服务端提供（广告与会员以官方为准），更新请以官方渠道为准。</div>
-      <div class="chips">
-        <span class="chip">官方原版</span><span class="chip">未修改 · 未破解</span><span class="chip">华为主题</span><span class="chip">免费下载</span>
-      </div>
-      <div class="btn-row">
-        <a class="btn primary" href="apks/zhutimao-v10.22.apk">⬇ 下载 APK</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="head">
-        <div class="logo">📦</div>
-        <div>
-          <div class="title">主题魔盒</div>
-          <div class="meta">官方正版 · 仿 iOS 主题库 · chmpro.cc</div>
-        </div>
-      </div>
-      <div class="desc">「全网最强仿iOS主题库」官方版：华为/小米/OPPO/vivo 全机型支持，仿灵动岛、苹果控制中心、桌面效果、小组件、音量弹窗、状态栏。本卡链接直达官方发布渠道（未做任何修改）。</div>
-      <div class="chips">
-        <span class="chip">官方正版</span><span class="chip">ICP备案</span><span class="chip">仿 iOS</span><span class="chip">免费下载</span>
-      </div>
-      <div class="btn-row">
-        <a class="btn primary" href="https://wwaxu.lanzoue.com/s/caihongmao">⬇ 官方下载</a>
-        <a class="btn ghost" href="https://1812169706.share.123pan.cn/123pan/89KrVv-GQe5d">备用链接</a>
-      </div>
-    </div>
+  <p class="sub">自研应用 + 全球开源精品，一站式直装。大文件走 GitHub Release 分发，商店 / 玩机 / Root / 跨平台容器全覆盖，全部合法合规、不破解任何闭源商业软件。</p>
+  <div class="stats">
+    <span class="stat"><b>22</b> 款应用</span>
+    <span class="stat"><b>3</b> 大分区</span>
+    <span class="stat"><b>100%</b> 免费</span>
+    <span class="stat">更新 <b>2026-10-18</b></span>
   </div>
-
-  <div class="secthead">🧰 应用商店 · 玩机 · Root</div>
-  <div class="sectsub">全部上游官方 Release 直链 · 装机自由</div>
-  <div class="cards">
-    <div class="card">
-      <div class="head">
-        <div class="logo">🧩</div>
-        <div>
-          <div class="title">F-Droid</div>
-          <div class="meta">v1.18.0 · 官方 GitHub 直链 · GPL-3.0</div>
-        </div>
-      </div>
-      <div class="desc">全网最大的安卓自由软件仓库与商店客户端：所有上架应用开源可查、统一签名校验，无广告无追踪。本卡为 f-droid 官方 GitHub Release 直链。</div>
-      <div class="chips">
-        <span class="chip">GPL-3.0</span><span class="chip">官方源</span><span class="chip">无广告无追踪</span>
-      </div>
-      <div class="btn-row">
-        <a class="btn primary" href="https://github.com/f-droid/fdroidclient/releases/download/1.18.0/org.fdroid.fdroid_1018050.apk">⬇ 下载 APK</a>
-        <a class="btn ghost" href="https://f-droid.org/">官网</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="head">
-        <div class="logo">🛍️</div>
-        <div>
-          <div class="title">Droid-ify</div>
-          <div class="meta">v0.7.8 · 5.7 MB · GPL-3.0 · 7603★</div>
-        </div>
-      </div>
-      <div class="desc">Material 3 风格的 F-Droid 第三方客户端：轻快省流、界面现代，支持全量自由软件仓库，日常装应用很顺手。</div>
-      <div class="chips">
-        <span class="chip">GPL-3.0</span><span class="chip">F-Droid 客户端</span><span class="chip">轻量</span>
-      </div>
-      <div class="btn-row">
-        <a class="btn primary" href="https://github.com/Droid-ify/client/releases/download/v0.7.8/app-release.apk">⬇ 下载 APK</a>
-        <a class="btn ghost" href="https://github.com/Droid-ify/client">上游仓库</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="head">
-        <div class="logo">🛒</div>
-        <div>
-          <div class="title">Neo Store</div>
-          <div class="meta">v1.3.2 · 5.6 MB · GPL-3.0 · 5472★</div>
-        </div>
-      </div>
-      <div class="desc">颜值在线的 F-Droid 客户端（Neo 系列出品）：沉浸式设计、友好分类浏览、注重隐私，商店体验一流。</div>
-      <div class="chips">
-        <span class="chip">GPL-3.0</span><span class="chip">F-Droid 客户端</span><span class="chip">精致 UI</span>
-      </div>
-      <div class="btn-row">
-        <a class="btn primary" href="https://github.com/NeoApplications/Neo-Store/releases/download/1.3.2/Neo_Store_1.3.2_release.apk">⬇ 下载 APK</a>
-        <a class="btn ghost" href="https://github.com/NeoApplications/Neo-Store">上游仓库</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="head">
-        <div class="logo">⬇️</div>
-        <div>
-          <div class="title">Obtainium</div>
-          <div class="meta">v1.7.0 · 26 MB (arm64) · GPL-3.0 · 20525★</div>
-        </div>
-      </div>
-      <div class="desc">直接跟踪 GitHub Releases 的应用管理器：把开源项目加入关注列表，自动发现新版并提示更新，开源党免商店装机必备。本链为主流 arm64，多架构见上游。</div>
-      <div class="chips">
-        <span class="chip">GPL-3.0</span><span class="chip">GitHub 追更</span><span class="chip">装机必备</span>
-      </div>
-      <div class="btn-row">
-        <a class="btn primary" href="https://github.com/ImranR98/Obtainium/releases/download/v1.7.0/app-arm64-v8a-release.apk">⬇ 下载 APK</a>
-        <a class="btn ghost" href="https://github.com/ImranR98/Obtainium">上游仓库</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="head">
-        <div class="logo">📟</div>
-        <div>
-          <div class="title">Termux</div>
-          <div class="meta">v0.118.3 · 34 MB (arm64) · GPL-3.0 · 62885★</div>
-        </div>
-      </div>
-      <div class="desc">安卓终端模拟器 + Linux 环境：内置 apt 包管理器，python/ssh/git/vim 即装即用，搞机与开发第一入口。本链为主流 arm64，其他架构见上游 Releases。</div>
-      <div class="chips">
-        <span class="chip">GPL-3.0</span><span class="chip">终端</span><span class="chip">apt 生态</span>
-      </div>
-      <div class="btn-row">
-        <a class="btn primary" href="https://github.com/termux/termux-app/releases/download/v0.118.3/termux-app_v0.118.3%2Bgithub-debug_arm64-v8a.apk">⬇ 下载 APK</a>
-        <a class="btn ghost" href="https://github.com/termux/termux-app">上游仓库</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="head">
-        <div class="logo">💧</div>
-        <div>
-          <div class="title">Shizuku</div>
-          <div class="meta">v13.6.0 · 2.5 MB · Apache-2.0 · 31718★</div>
-        </div>
-      </div>
-      <div class="desc">免 Root 调用系统 API 的神装：用 ADB / 无线调试授权后，为数百个玩机应用提供系统级能力（应用管理、权限管控、截图等）。</div>
-      <div class="chips">
-        <span class="chip">Apache-2.0</span><span class="chip">免 Root</span><span class="chip">ADB</span>
-      </div>
-      <div class="btn-row">
-        <a class="btn primary" href="https://github.com/RikkaApps/Shizuku/releases/download/v13.6.0/shizuku-v13.6.0.r1086.2650830c-release.apk">⬇ 下载 APK</a>
-        <a class="btn ghost" href="https://github.com/RikkaApps/Shizuku">上游仓库</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="head">
-        <div class="logo">🎩</div>
-        <div>
-          <div class="title">Magisk</div>
-          <div class="meta">v30.7 · 11 MB · GPL-3.0 · 63338★</div>
-        </div>
-      </div>
-      <div class="desc">成名已久的 systemless Root 方案：模块生态、协议模拟、隐藏 Root；解锁 BootLoader 后刷入。Root 管理器的标杆。</div>
-      <div class="chips">
-        <span class="chip">GPL-3.0</span><span class="chip">Root</span><span class="chip">模块生态</span>
-      </div>
-      <div class="btn-row">
-        <a class="btn primary" href="https://github.com/topjohnwu/Magisk/releases/download/v30.7/Magisk-v30.7.apk">⬇ 下载 APK</a>
-        <a class="btn ghost" href="https://github.com/topjohnwu/Magisk">上游仓库</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="head">
-        <div class="logo">⚙️</div>
-        <div>
-          <div class="title">KernelSU</div>
-          <div class="meta">v3.3.1 · 13 MB · GPL-3.0 · 19376★</div>
-        </div>
-      </div>
-      <div class="desc">内核级 Root：授权由内核直接管理，支持模块系统与更隐蔽的权限方案，新一代 Root 代表。</div>
-      <div class="chips">
-        <span class="chip">GPL-3.0</span><span class="chip">内核 Root</span><span class="chip">模块</span>
-      </div>
-      <div class="btn-row">
-        <a class="btn primary" href="https://github.com/tiann/KernelSU/releases/download/v3.3.1/KernelSU_v3.3.1_32680-release.apk">⬇ 下载 APK</a>
-        <a class="btn ghost" href="https://github.com/tiann/KernelSU">上游仓库</a>
-      </div>
-    </div>
+  <div class="searchwrap">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input id="q" type="text" placeholder="搜索应用：音乐 / 主题 / Root / Windows …" autocomplete="off">
+    <kbd>esc 清空</kbd>
   </div>
+</header>
 
-  <div class="secthead">🧩 跨平台运行 · 小容器</div>
-  <div class="sectsub">Windows 程序 / Linux 整机 / 容器 · 全开源</div>
-  <div class="cards">
-    <div class="card">
-      <div class="head">
-        <div class="logo">🪟</div>
-        <div>
-          <div class="title">Winlator</div>
-          <div class="meta">v11.2 · 150 MB · LGPL-2.1 · 19515★</div>
+<main>
+  <section class="sect" id="featured">
+    <div class="secthead">精选 · 自研与官方原版</div>
+    <div class="sectsub">自研作品免费开源 · 官方应用原包直存 · 绝不修改</div>
+    <div class="cards">
+
+      <div class="card" style="--a:rgba(244,114,182,.5);--b:rgba(139,92,246,.42)" data-k="流光音乐 音乐 播放器 music 自研 液态玻璃 在线音乐 搜索 歌单">
+        <div class="head">
+          <div class="logo">🎵</div>
+          <div>
+            <div class="title">流光音乐 <span class="badge-new"><i></i>NEW</span></div>
+            <div class="meta">v1.0 · 18 MB · Android 8.0+ · <code>自研开源</code></div>
+          </div>
+        </div>
+        <div class="desc">液态玻璃质感的多源在线音乐播放器：多平台搜索、自动换源、收藏、歌单、逐行歌词。v2.0 正在重构上传——升级标准 MediaSession 内核（锁屏 / 通知栏控制、耳机线控、音频焦点）与全新「纪念版」界面，敬请期待。</div>
+        <div class="chips"><span class="chip">Kotlin / Compose</span><span class="chip">Media3 内核</span><span class="chip">多源聚合</span></div>
+        <div class="btn-row">
+          <a class="btn primary" href="apks/liuguang-music-v1.0.apk">⬇ 下载 APK</a>
+          <a class="btn ghost" href="apks/liuguang-music-v1.0.apk" download="流光音乐-v1.0.apk">另存为</a>
+        </div>
+        <div class="note">v2.0 即将发布：更换正式签名，届时 v1.0 老用户需卸载后重装一次</div>
+      </div>
+
+      <div class="card" style="--a:rgba(99,102,241,.55);--b:rgba(34,211,238,.4)" data-k="灵动岛 灵动岛pro island 动态岛 胶囊 充电 音乐 自研">
+        <div class="head">
+          <div class="logo">🏝️</div>
+          <div>
+            <div class="title">灵动岛 Pro <span class="badge-new"><i></i>NEW</span></div>
+            <div class="meta">v1.0.0 · 10.2 MB · Android 8.0+ · <code>自研开源</code></div>
+          </div>
+        </div>
+        <div class="desc">我们把 iPhone 的「灵动岛」带进了安卓：充电弹出绿色电量胶囊，播放音乐时展开歌曲胶囊，点按即开设置。悬浮窗方案免 Root，理念致谢开源社区 livebridge (GPL-3.0) 与 HyperIsland (MIT)，实现完全自研、永久免费。</div>
+        <div class="chips"><span class="chip">Kotlin / Compose</span><span class="chip">免 Root</span><span class="chip">悬浮胶囊</span></div>
+        <div class="btn-row">
+          <a class="btn primary" href="apks/liuguang-island-v1.0.apk">⬇ 下载 APK</a>
+          <a class="btn ghost" href="https://github.com/1yk8u/liuguang-island">开源源码</a>
         </div>
       </div>
-      <div class="desc">在安卓直跑 Windows 程序：自带 Wine + Box86/Box64 转译容器，桌面软件与游戏装进手机即跑（arm 转译 x86/x64），免 Root。官方上游 Release 直链，体量大请耐心下载。</div>
-      <div class="chips">
-        <span class="chip">LGPL-2.1</span><span class="chip">Wine 容器</span><span class="chip">免 Root</span>
+
+      <div class="card" style="--a:rgba(251,146,60,.45);--b:rgba(139,92,246,.4)" data-k="主题 pro 主题pro 流光主题 华为 荣耀 emui harmonyos magicos hwt hnt 液态玻璃 图标">
+        <div class="head">
+          <div class="logo">🎨</div>
+          <div>
+            <div class="title">主题Pro <span class="badge-new"><i></i>NEW</span></div>
+            <div class="meta">v1.2.0 · 16 MB · Android 7.0+ · <code>GPL-3.0 开源</code></div>
+          </div>
+        </div>
+        <div class="desc">华为/荣耀（EMUI · HarmonyOS 4.x · MagicOS）主题库客户端，原「流光主题」正式升级更名：全新液态玻璃风格图标、在线主题库持续扩容（新增主题无需发版）、大图卡片 + 标签筛选 + .hwt/.hnt 一键导入。基于 GPL-3.0 开源项目 FanChen-Theme-Library 完全重构。</div>
+        <div class="chips"><span class="chip">GPL-3.0</span><span class="chip">在线主题库</span><span class="chip">液态玻璃图标</span><span class="chip">永久免费</span></div>
+        <div class="btn-row">
+          <a class="btn primary" href="apks/liuguang-theme-v1.2.apk">⬇ 下载 APK</a>
+          <a class="btn ghost" href="https://github.com/1yk8u/liuguang-theme">开源源码</a>
+        </div>
+        <div class="note">v1.2 更换正式签名，旧版本用户需卸载后重装一次</div>
       </div>
-      <div class="btn-row">
-        <a class="btn primary" href="https://github.com/brunodev85/winlator/releases/download/v11.2.0/Winlator_11.2.apk">⬇ 下载 APK</a>
-        <a class="btn ghost" href="https://github.com/brunodev85/winlator">上游仓库</a>
+
+      <div class="card" style="--a:rgba(59,130,246,.5);--b:rgba(34,211,238,.38)" data-k="alist 网盘 云盘 webdav 直链 阿里 百度 夸克 onedrive">
+        <div class="head">
+          <div class="logo">🌐</div>
+          <div>
+            <div class="title">AlistApp</div>
+            <div class="meta">v1.0 · 172.6 MB · Android 8.0+ · 内核 alist 3.65.0</div>
+          </div>
+        </div>
+        <div class="desc">手机自建私人网盘：内置官方 alist 内核，支持阿里/百度/夸克/123/OneDrive/GitHub 等全存储驱动，直链下载、直链分享、WebDAV 全制式。</div>
+        <div class="chips"><span class="chip">AGPL-3.0 开源</span><span class="chip">官方内核</span><span class="chip">WebDAV</span><span class="chip">直链分享</span></div>
+        <div class="btn-row">
+          <a class="btn primary" href="https://github.com/1yk8u/app1/releases/download/v1.0/AlistApp-v1.0.apk">⬇ 下载 APK</a>
+          <a class="btn ghost" href="https://github.com/1yk8u/app1/releases/tag/v1.0">版本说明</a>
+        </div>
+      </div>
+
+      <div class="card" style="--a:rgba(139,92,246,.5);--b:rgba(59,130,246,.4)" data-k="visual code space 编辑器 代码 编程 ide ai vcs">
+        <div class="head">
+          <div class="logo">🤖</div>
+          <div>
+            <div class="title">Visual Code Space</div>
+            <div class="meta">v2.0.1 · 31 MB · Android 8.0+ · <code>GPL-3.0</code></div>
+          </div>
+        </div>
+        <div class="desc">手机上的现代 AI 编程编辑器：多语言高亮补全、内置 AI 助手对话、文件管理与插件生态，随时随地写代码。（本页直存上游官方 v2.0.1 原包）</div>
+        <div class="chips"><span class="chip">GPL-3.0 开源</span><span class="chip">内置 AI</span><span class="chip">688★</span><span class="chip">轻量</span></div>
+        <div class="btn-row">
+          <a class="btn primary" href="apks/vcs-v2.0.1.apk">⬇ 下载 APK</a>
+          <a class="btn ghost" href="https://github.com/Visual-Code-Space/Visual-Code-Space">上游仓库</a>
+        </div>
+      </div>
+
+      <div class="card" style="--a:rgba(248,113,113,.45);--b:rgba(139,92,246,.38)" data-k="mobile harness claude ai 编程 离线 大模型">
+        <div class="head">
+          <div class="logo">🛰️</div>
+          <div>
+            <div class="title">Mobile Harness</div>
+            <div class="meta">v1.0.7 · 85 MB · Android 9.0+ · <code>MIT</code></div>
+          </div>
+        </div>
+        <div class="desc">"Claude Code on Android"：把 Claude 级 AI 编程能力装进口袋。此为在线版（连接你自己的 Claude / LLM 账号）；另有 848 MB 内置模型离线版，请到上游 Releases 获取。</div>
+        <div class="chips"><span class="chip">MIT 许可</span><span class="chip">Claude 级 AI</span><span class="chip">640★</span><span class="chip">BYOK</span></div>
+        <div class="btn-row">
+          <a class="btn primary" href="apks/mobile-harness-online-v1.0.7.apk">⬇ 下载 APK</a>
+          <a class="btn ghost" href="https://github.com/techjarves/Mobile-Harness/releases">离线版/上游</a>
+        </div>
+      </div>
+
+      <div class="card" style="--a:rgba(96,165,250,.45);--b:rgba(45,212,191,.38)" data-k="aidlearning aidlux linux python ai 深度学习 容器">
+        <div class="head">
+          <div class="logo">🐧</div>
+          <div>
+            <div class="title">AidLearning (AidLux)</div>
+            <div class="meta">v2.1.0 · 1.47 GB · 上游直链 · 开源</div>
+          </div>
+        </div>
+        <div class="desc">安卓上的 Linux + Python + AI 开发平台：手机跑 Linux 容器、深度学习环境与图形界面，AIOT 全家桶。体量大，本页提供上游官方直链，不重复托管。</div>
+        <div class="chips"><span class="chip">5814★</span><span class="chip">Linux on Android</span><span class="chip">AI/Python</span></div>
+        <div class="btn-row">
+          <a class="btn primary" href="https://github.com/aidlearning/AidLearning-FrameWork/releases/download/V2.1.0/aidlux_2.1.0_latest_release.apk">⬇ 上游直链下载</a>
+          <a class="btn ghost" href="https://github.com/aidlearning/AidLearning-FrameWork">上游仓库</a>
+        </div>
+      </div>
+
+      <div class="card" style="--a:rgba(251,191,36,.4);--b:rgba(244,114,182,.4)" data-k="主题猫 华为 荣耀 主题 官方">
+        <div class="head">
+          <div class="logo">🐱</div>
+          <div>
+            <div class="title">主题猫</div>
+            <div class="meta">v10.22 · 20 MB · Android 7.0+ · 官方原版</div>
+          </div>
+        </div>
+        <div class="desc">华为/荣耀主题库聚合客户端。官方原版直存：未修改、未破解，内容与功能由官方服务端提供（广告与会员以官方为准），更新请以官方渠道为准。</div>
+        <div class="chips"><span class="chip">官方原版</span><span class="chip">未修改 · 未破解</span><span class="chip">华为主题</span><span class="chip">免费下载</span></div>
+        <div class="btn-row">
+          <a class="btn primary" href="apks/zhutimao-v10.22.apk">⬇ 下载 APK</a>
+        </div>
+      </div>
+
+      <div class="card" style="--a:rgba(167,139,250,.45);--b:rgba(251,146,60,.38)" data-k="主题魔盒 仿ios 灵动岛 控制中心 小组件 华为 小米 oppo vivo">
+        <div class="head">
+          <div class="logo">📦</div>
+          <div>
+            <div class="title">主题魔盒</div>
+            <div class="meta">官方正版 · 仿 iOS 主题库 · chmpro.cc</div>
+          </div>
+        </div>
+        <div class="desc">「全网最强仿iOS主题库」官方版：华为/小米/OPPO/vivo 全机型支持，仿灵动岛、苹果控制中心、桌面效果、小组件、音量弹窗、状态栏。本卡链接直达官方发布渠道（未做任何修改）。</div>
+        <div class="chips"><span class="chip">官方正版</span><span class="chip">ICP备案</span><span class="chip">仿 iOS</span><span class="chip">免费下载</span></div>
+        <div class="btn-row">
+          <a class="btn primary" href="https://wwaxu.lanzoue.com/s/caihongmao">⬇ 官方下载</a>
+          <a class="btn ghost" href="https://1812169706.share.123pan.cn/123pan/89KrVv-GQe5d">备用链接</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sect" id="store">
+    <div class="secthead">🧰 应用商店 · 玩机 · Root</div>
+    <div class="sectsub">全部上游官方 Release 直链 · 装机自由</div>
+    <div class="cards">
+
+      <div class="card" style="--a:rgba(52,211,153,.42);--b:rgba(59,130,246,.4)" data-k="f-droid fdroid 商店 自由软件 开源商店">
+        <div class="head">
+          <div class="logo">🧩</div>
+          <div>
+            <div class="title">F-Droid</div>
+            <div class="meta">v1.18.0 · 官方 GitHub 直链 · <code>GPL-3.0</code></div>
+          </div>
+        </div>
+        <div class="desc">全网最大的安卓自由软件仓库与商店客户端：所有上架应用开源可查、统一签名校验，无广告无追踪。本卡为 f-droid 官方 GitHub Release 直链。</div>
+        <div class="chips"><span class="chip">GPL-3.0</span><span class="chip">官方源</span><span class="chip">无广告无追踪</span></div>
+        <div class="btn-row">
+          <a class="btn primary" href="https://github.com/f-droid/fdroidclient/releases/download/1.18.0/org.fdroid.fdroid_1018050.apk">⬇ 下载 APK</a>
+          <a class="btn ghost" href="https://f-droid.org/">官网</a>
+        </div>
+      </div>
+
+      <div class="card" style="--a:rgba(129,140,248,.45);--b:rgba(52,211,153,.35)" data-k="droid-ify fdroid 客户端 商店 material">
+        <div class="head">
+          <div class="logo">🛍️</div>
+          <div>
+            <div class="title">Droid-ify</div>
+            <div class="meta">v0.7.8 · 5.7 MB · <code>GPL-3.0</code> · 7603★</div>
+          </div>
+        </div>
+        <div class="desc">Material 3 风格的 F-Droid 第三方客户端：轻快省流、界面现代，支持全量自由软件仓库，日常装应用很顺手。</div>
+        <div class="chips"><span class="chip">GPL-3.0</span><span class="chip">F-Droid 客户端</span><span class="chip">轻量</span></div>
+        <div class="btn-row">
+          <a class="btn primary" href="https://github.com/Droid-ify/client/releases/download/v0.7.8/app-release.apk">⬇ 下载 APK</a>
+          <a class="btn ghost" href="https://github.com/Droid-ify/client">上游仓库</a>
+        </div>
+      </div>
+
+      <div class="card" style="--a:rgba(244,114,182,.42);--b:rgba(129,140,248,.4)" data-k="neo store fdroid 客户端 商店 颜值">
+        <div class="head">
+          <div class="logo">🛒</div>
+          <div>
+            <div class="title">Neo Store</div>
+            <div class="meta">v1.3.2 · 5.6 MB · <code>GPL-3.0</code> · 5472★</div>
+          </div>
+        </div>
+        <div class="desc">颜值在线的 F-Droid 客户端（Neo 系列出品）：沉浸式设计、友好分类浏览、注重隐私，商店体验一流。</div>
+        <div class="chips"><span class="chip">GPL-3.0</span><span class="chip">F-Droid 客户端</span><span class="chip">精致 UI</span></div>
+        <div class="btn-row">
+          <a class="btn primary" href="https://github.com/NeoApplications/Neo-Store/releases/download/1.3.2/Neo_Store_1.3.2_release.apk">⬇ 下载 APK</a>
+          <a class="btn ghost" href="https://github.com/NeoApplications/Neo-Store">上游仓库</a>
+        </div>
+      </div>
+
+      <div class="card" style="--a:rgba(56,189,248,.42);--b:rgba(139,92,246,.38)" data-k="obtainium 更新 追更 github releases 商店">
+        <div class="head">
+          <div class="logo">⬇️</div>
+          <div>
+            <div class="title">Obtainium</div>
+            <div class="meta">v1.7.0 · 26 MB (arm64) · <code>GPL-3.0</code> · 20525★</div>
+          </div>
+        </div>
+        <div class="desc">直接跟踪 GitHub Releases 的应用管理器：把开源项目加入关注列表，自动发现新版并提示更新，开源党免商店装机必备。本链为主流 arm64，多架构见上游。</div>
+        <div class="chips"><span class="chip">GPL-3.0</span><span class="chip">GitHub 追更</span><span class="chip">装机必备</span></div>
+        <div class="btn-row">
+          <a class="btn primary" href="https://github.com/ImranR98/Obtainium/releases/download/v1.7.0/app-arm64-v8a-release.apk">⬇ 下载 APK</a>
+          <a class="btn ghost" href="https://github.com/ImranR98/Obtainium">上游仓库</a>
+        </div>
+      </div>
+
+      <div class="card" style="--a:rgba(250,204,21,.36);--b:rgba(52,211,153,.38)" data-k="termux 终端 linux 命令行 apt ssh python opencode">
+        <div class="head">
+          <div class="logo">📟</div>
+          <div>
+            <div class="title">Termux</div>
+            <div class="meta">v0.118.3 · 34 MB (arm64) · <code>GPL-3.0</code> · 62885★</div>
+          </div>
+        </div>
+        <div class="desc">安卓终端模拟器 + Linux 环境：内置 apt 包管理器，python/ssh/git/vim 即装即用，搞机与开发第一入口。本链为主流 arm64，其他架构见上游 Releases。</div>
+        <div class="chips"><span class="chip">GPL-3.0</span><span class="chip">终端</span><span class="chip">apt 生态</span></div>
+        <div class="btn-row">
+          <a class="btn primary" href="https://github.com/termux/termux-app/releases/download/v0.118.3/termux-app_v0.118.3%2Bgithub-debug_arm64-v8a.apk">⬇ 下载 APK</a>
+          <a class="btn ghost" href="https://github.com/termux/termux-app">上游仓库</a>
+        </div>
+      </div>
+
+      <div class="card" style="--a:rgba(96,165,250,.45);--b:rgba(167,139,250,.4)" data-k="shizuku 免root adb 调试 api 玩机">
+        <div class="head">
+          <div class="logo">💧</div>
+          <div>
+            <div class="title">Shizuku</div>
+            <div class="meta">v13.6.0 · 2.5 MB · <code>Apache-2.0</code> · 31718★</div>
+          </div>
+        </div>
+        <div class="desc">免 Root 调用系统 API 的神装：用 ADB / 无线调试授权后，为数百个玩机应用提供系统级能力（应用管理、权限管控、截图等）。</div>
+        <div class="chips"><span class="chip">Apache-2.0</span><span class="chip">免 Root</span><span class="chip">ADB</span></div>
+        <div class="btn-row">
+          <a class="btn primary" href="https://github.com/RikkaApps/Shizuku/releases/download/v13.6.0/shizuku-v13.6.0.r1086.2650830c-release.apk">⬇ 下载 APK</a>
+          <a class="btn ghost" href="https://github.com/RikkaApps/Shizuku">上游仓库</a>
+        </div>
+      </div>
+
+      <div class="card" style="--a:rgba(52,211,153,.4);--b:rgba(250,204,21,.32)" data-k="magisk root 模块 systemless 刷机 bootloader">
+        <div class="head">
+          <div class="logo">🎩</div>
+          <div>
+            <div class="title">Magisk</div>
+            <div class="meta">v30.7 · 11 MB · <code>GPL-3.0</code> · 63338★</div>
+          </div>
+        </div>
+        <div class="desc">成名已久的 systemless Root 方案：模块生态、协议模拟、隐藏 Root；解锁 BootLoader 后刷入。Root 管理器的标杆。</div>
+        <div class="chips"><span class="chip">GPL-3.0</span><span class="chip">Root</span><span class="chip">模块生态</span></div>
+        <div class="btn-row">
+          <a class="btn primary" href="https://github.com/topjohnwu/Magisk/releases/download/v30.7/Magisk-v30.7.apk">⬇ 下载 APK</a>
+          <a class="btn ghost" href="https://github.com/topjohnwu/Magisk">上游仓库</a>
+        </div>
+      </div>
+
+      <div class="card" style="--a:rgba(251,146,60,.4);--b:rgba(139,92,246,.35)" data-k="kernelsu root 内核 模块 刷机">
+        <div class="head">
+          <div class="logo">⚙️</div>
+          <div>
+            <div class="title">KernelSU</div>
+            <div class="meta">v3.3.1 · 13 MB · <code>GPL-3.0</code> · 19376★</div>
+          </div>
+        </div>
+        <div class="desc">内核级 Root：授权由内核直接管理，支持模块系统与更隐蔽的权限方案，新一代 Root 代表。</div>
+        <div class="chips"><span class="chip">GPL-3.0</span><span class="chip">内核 Root</span><span class="chip">模块</span></div>
+        <div class="btn-row">
+          <a class="btn primary" href="https://github.com/tiann/KernelSU/releases/download/v3.3.1/KernelSU_v3.3.1_32680-release.apk">⬇ 下载 APK</a>
+          <a class="btn ghost" href="https://github.com/tiann/KernelSU">上游仓库</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sect" id="cross">
+    <div class="secthead">🧩 跨平台运行 · 小容器</div>
+    <div class="sectsub">Windows 程序 / Linux 整机 / 容器 · 全开源</div>
+    <div class="cards">
+
+      <div class="card" style="--a:rgba(96,165,250,.45);--b:rgba(52,211,153,.35)" data-k="winlator windows wine 模拟器 容器 游戏">
+        <div class="head">
+          <div class="logo">🪟</div>
+          <div>
+            <div class="title">Winlator</div>
+            <div class="meta">v11.2 · 150 MB · <code>LGPL-2.1</code> · 19515★</div>
+          </div>
+        </div>
+        <div class="desc">在安卓直跑 Windows 程序：自带 Wine + Box86/Box64 转译容器，桌面软件与游戏装进手机即跑（arm 转译 x86/x64），免 Root。官方上游 Release 直链，体量大请耐心下载。</div>
+        <div class="chips"><span class="chip">LGPL-2.1</span><span class="chip">Wine 容器</span><span class="chip">免 Root</span></div>
+        <div class="btn-row">
+          <a class="btn primary" href="https://github.com/brunodev85/winlator/releases/download/v11.2.0/Winlator_11.2.apk">⬇ 下载 APK</a>
+          <a class="btn ghost" href="https://github.com/brunodev85/winlator">上游仓库</a>
+        </div>
+      </div>
+
+      <div class="card" style="--a:rgba(148,163,184,.4);--b:rgba(96,165,250,.38)" data-k="limbo qemu 虚拟机 整机 linux x86">
+        <div class="head">
+          <div class="logo">🖥️</div>
+          <div>
+            <div class="title">Limbo (QEMU)</div>
+            <div class="meta">v6.0.1 · 31 MB (arm) · <code>GPL-2.0</code> · 3468★</div>
+          </div>
+        </div>
+        <div class="desc">QEMU 移植的完整 PC 模拟器：加载 Linux / x86 系统镜像，在手机里虚拟一整台电脑（性能视机型而定）。</div>
+        <div class="chips"><span class="chip">GPL-2.0</span><span class="chip">QEMU</span><span class="chip">虚拟整机</span></div>
+        <div class="btn-row">
+          <a class="btn primary" href="https://github.com/limboemu/limbo/releases/download/v6.0.1-LimboEmulator/limbo-android-arm-6.0.1-qemu-5.1.0.apk">⬇ 下载 APK</a>
+          <a class="btn ghost" href="https://github.com/limboemu/limbo">上游仓库</a>
+        </div>
+      </div>
+
+      <div class="card" style="--a:rgba(45,212,191,.4);--b:rgba(96,165,250,.4)" data-k="userland linux ubuntu debian kali 免root 容器">
+        <div class="head">
+          <div class="logo">🐚</div>
+          <div>
+            <div class="title">UserLAnd</div>
+            <div class="meta">v2.8.3 · 16 MB · 开源 · 4320★</div>
+          </div>
+        </div>
+        <div class="desc">无需 Root 在手机跑完整 Linux 发行版（Ubuntu / Debian / Kali…）：一键建立会话，还带图形界面模板，真正的"手机上的 Linux 电脑"。</div>
+        <div class="chips"><span class="chip">开源</span><span class="chip">免 Root</span><span class="chip">多发行版</span></div>
+        <div class="btn-row">
+          <a class="btn primary" href="https://github.com/CypherpunkArmory/UserLAnd/releases/download/v2.8.3/app-release.apk">⬇ 下载 APK</a>
+          <a class="btn ghost" href="https://github.com/CypherpunkArmory/UserLAnd">上游仓库</a>
+        </div>
+      </div>
+
+      <div class="card" style="--a:rgba(250,204,21,.34);--b:rgba(52,211,153,.36)" data-k="termux x11 图形 桌面 gui 显示">
+        <div class="head">
+          <div class="logo">🖼️</div>
+          <div>
+            <div class="title">Termux:X11</div>
+            <div class="meta">上游 Releases 直达 · <code>GPL-3.0</code> · 4971★</div>
+          </div>
+        </div>
+        <div class="desc">Termux 的图形显示伴侣：为 Termux 里的 Linux 桌面与应用提供真正的 X11 图形画面，两者配合在手机跑出桌面级 GUI。Nightly 更新频繁，直链放上游 Releases 页。</div>
+        <div class="chips"><span class="chip">GPL-3.0</span><span class="chip">X11</span><span class="chip">搭配 Termux</span></div>
+        <div class="btn-row">
+          <a class="btn primary" href="https://github.com/termux/termux-x11/releases">⬇ 上游 Releases</a>
+          <a class="btn ghost" href="https://github.com/termux/termux-x11">上游仓库</a>
+        </div>
+      </div>
+
+      <div class="card" style="--a:rgba(129,140,248,.5);--b:rgba(244,114,182,.4)" data-k="opencode ai 编程 agent 终端 tui termux">
+        <div class="head">
+          <div class="logo">⌨️</div>
+          <div>
+            <div class="title">OpenCode</div>
+            <div class="meta">v1.19.3 · 终端 TUI · <code>MIT</code> · 215873★</div>
+          </div>
+        </div>
+        <div class="desc">开源 AI 编程智能体：Agent 化写代码、改仓库。官方支持 Windows / macOS / Linux；手机端走 Termux 完成"Linux 移植"——装好 Termux 后执行 apt install nodejs，再 npm i -g opencode-ai，输入 opencode 即用，TUI 自动适配手机竖屏。</div>
+        <div class="chips"><span class="chip">MIT</span><span class="chip">AI 编程</span><span class="chip">Termux 可跑</span></div>
+        <div class="btn-row">
+          <a class="btn primary" href="https://opencode.ai">官网 / 桌面版</a>
+          <a class="btn ghost" href="https://github.com/anomalyco/opencode">GitHub 仓库</a>
+        </div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="head">
-        <div class="logo">🖥️</div>
-        <div>
-          <div class="title">Limbo (QEMU)</div>
-          <div class="meta">v6.0.1 · 31 MB (arm) · GPL-2.0 · 3468★</div>
-        </div>
-      </div>
-      <div class="desc">QEMU 移植的完整 PC 模拟器：加载 Linux / x86 系统镜像，在手机里虚拟一整台电脑（性能视机型而定）。</div>
-      <div class="chips">
-        <span class="chip">GPL-2.0</span><span class="chip">QEMU</span><span class="chip">虚拟整机</span>
-      </div>
-      <div class="btn-row">
-        <a class="btn primary" href="https://github.com/limboemu/limbo/releases/download/v6.0.1-LimboEmulator/limbo-android-arm-6.0.1-qemu-5.1.0.apk">⬇ 下载 APK</a>
-        <a class="btn ghost" href="https://github.com/limboemu/limbo">上游仓库</a>
-      </div>
-    </div>
+    <div class="noresult" id="noResult">🔍 没有匹配的应用——换个关键词试试</div>
+  </section>
+</main>
 
-    <div class="card">
-      <div class="head">
-        <div class="logo">🐚</div>
-        <div>
-          <div class="title">UserLAnd</div>
-          <div class="meta">v2.8.3 · 16 MB · 开源 · 4320★</div>
-        </div>
-      </div>
-      <div class="desc">无需 Root 在手机跑完整 Linux 发行版（Ubuntu / Debian / Kali…）：一键建立会话，还带图形界面模板，真正的"手机上的 Linux 电脑"。</div>
-      <div class="chips">
-        <span class="chip">开源</span><span class="chip">免 Root</span><span class="chip">多发行版</span>
-      </div>
-      <div class="btn-row">
-        <a class="btn primary" href="https://github.com/CypherpunkArmory/UserLAnd/releases/download/v2.8.3/app-release.apk">⬇ 下载 APK</a>
-        <a class="btn ghost" href="https://github.com/CypherpunkArmory/UserLAnd">上游仓库</a>
-      </div>
-    </div>
+<footer>
+  <div class="fbrand"><span class="mark">流</span>流光开源 · 应用中心</div>
+  <div>GitHub Pages 托管 · 大文件经 Releases 分发 · 更新日期 2026-10-18</div>
+</footer>
 
-    <div class="card">
-      <div class="head">
-        <div class="logo">🖼️</div>
-        <div>
-          <div class="title">Termux:X11</div>
-          <div class="meta">上游 Releases 直达 · GPL-3.0 · 4971★</div>
-        </div>
-      </div>
-      <div class="desc">Termux 的图形显示伴侣：为 Termux 里的 Linux 桌面与应用提供真正的 X11 图形画面，两者配合在手机跑出桌面级 GUI。Nightly 更新频繁，直链放上游 Releases 页。</div>
-      <div class="chips">
-        <span class="chip">GPL-3.0</span><span class="chip">X11</span><span class="chip">搭配 Termux</span>
-      </div>
-      <div class="btn-row">
-        <a class="btn primary" href="https://github.com/termux/termux-x11/releases">⬇ 上游 Releases</a>
-        <a class="btn ghost" href="https://github.com/termux/termux-x11">上游仓库</a>
-      </div>
+<div class="cap-mask" id="capMask">
+  <div class="cap-panel" id="capPanel">
+    <h3>🧠 人机验证</h3>
+    <div class="cap-sub">拖动滑块，把三角碎片拼回缺口 —— 证明屏幕前是人类，不是爬虫。</div>
+    <div class="cap-canvas-wrap"><canvas id="capCanvas"></canvas></div>
+    <div class="cap-track">
+      <div class="cap-fill" id="capFill"></div>
+      <div class="cap-thumb" id="capThumb">▶</div>
+      <div class="cap-hint" id="capHint">按住我，拖到三角缺口上</div>
     </div>
-
-    <div class="card">
-      <div class="head">
-        <div class="logo">⌨️</div>
-        <div>
-          <div class="title">OpenCode</div>
-          <div class="meta">v1.19.3 · 终端 TUI · MIT · 215873★</div>
-        </div>
-      </div>
-      <div class="desc">开源 AI 编程智能体：Agent 化写代码、改仓库。官方支持 Windows / macOS / Linux；手机端走 Termux 完成"Linux 移植"——装好 Termux 后执行 apt install nodejs，再 npm i -g opencode-ai，输入 opencode 即用，TUI 自动适配手机竖屏。</div>
-      <div class="chips">
-        <span class="chip">MIT</span><span class="chip">AI 编程</span><span class="chip">Termux 可跑</span>
-      </div>
-      <div class="btn-row">
-        <a class="btn primary" href="https://opencode.ai">官网 / 桌面版</a>
-        <a class="btn ghost" href="https://github.com/anomalyco/opencode">GitHub 仓库</a>
-      </div>
-    </div>
+    <div class="cap-status" id="capStatus"></div>
   </div>
-
-  <div class="qrbox" id="qrbox">
-    <h3>📱 手机扫码安装</h3>
-    <p class="tip">用手机相机或微信「扫一扫」对准二维码</p>
-    <div id="qr"></div>
-    <div id="url"></div>
-  </div>
-
-  <div class="steps">
-    <h3>安装须知</h3>
-    <div class="stepgrid">
-      <div class="step"><b>1 允许未知来源</b><br>首次安装请在系统设置中允许"未知来源应用"，或浏览器内直接允许。</div>
-      <div class="step"><b>2 大文件耐心等</b><br>AlistApp 约 172 MB、Winlator 约 150 MB，下载完成后再点安装；支持断点续传。</div>
-      <div class="step"><b>3 首次使用</b><br>AlistApp 打开后等待"网盘服务运行中"通知，弹窗内含初始管理密码。</div>
-      <div class="step"><b>4 Root 系列须知</b><br>Magisk / KernelSU 需先按机型官方流程解锁 BootLoader（有变砖风险，自行评估）；Shizuku 免 Root，用 ADB 或无线调试授权即可。</div>
-      <div class="step"><b>5 OpenCode 手机端</b><br>装好 Termux 后：apt install nodejs → npm i -g opencode-ai → 输入 opencode，即可在竖屏终端用 AI 编程Agent。</div>
-    </div>
-  </div>
-
-  <footer>GitHub Pages 托管 · 大文件经 Releases 分发 · <span id="lan">局域网备用地址见页脚</span> · 更新日期 2026-10-18</footer>
+</div>
 
 <script>
-/* qrcodejs (davidshimjs), 内联以便完全离线可用 */
-var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this.parsedData=[];for(var b=[],d=0,e=this.data.length;e>d;d++){var f=this.data.charCodeAt(d);f>65536?(b[0]=240|(1835008&f)>>>18,b[1]=128|(258048&f)>>>12,b[2]=128|(4032&f)>>>6,b[3]=128|63&f):f>2048?(b[0]=224|(61440&f)>>>12,b[1]=128|(4032&f)>>>6,b[2]=128|63&f):f>128?(b[0]=192|(1984&f)>>>6,b[1]=128|63&f):b[0]=f,this.parsedData=this.parsedData.concat(b)}this.parsedData.length!=this.data.length&&(this.parsedData.unshift(191),this.parsedData.unshift(187),this.parsedData.unshift(239))}function b(a,b){this.typeNumber=a,this.errorCorrectLevel=b,this.modules=null,this.moduleCount=0,this.dataCache=null,this.dataList=[]}function i(a,b){if(void 0==a.length)throw new Error(a.length+"/"+b);for(var c=0;c<a.length&&0==a[c];)c++;this.num=new Array(a.length-c+b);for(var d=0;d<a.length-c;d++)this.num[d]=a[d+c]}function j(a,b){this.totalCount=a,this.dataCount=b}function k(){this.buffer=[],this.length=0}function m(){return"undefined"!=typeof CanvasRenderingContext2D}function n(){var a=!1,b=navigator.userAgent;return/android/i.test(b)&&(a=!0,aMat=b.toString().match(/android ([0-9]\.[0-9])/i),aMat&&aMat[1]&&(a=parseFloat(aMat[1]))),a}function r(a,b){for(var c=1,e=s(a),f=0,g=l.length;g>=f;f++){var h=0;switch(b){case d.L:h=l[f][0];break;case d.M:h=l[f][1];break;case d.Q:h=l[f][2];break;case d.H:h=l[f][3]}if(h>=e)break;c++}if(c>l.length)throw new Error("Too long data");return c}function s(a){var b=encodeURI(a).toString().replace(/\%[0-9a-fA-F]{2}/g,"a");return b.length+(b.length!=a?3:0)}a.prototype={getLength:function(){return this.parsedData.length},write:function(a){for(var b=0,c=this.parsedData.length;c>b;b++)a.put(this.parsedData[b],8)}},b.prototype={addData:function(b){var c=new a(b);this.dataList.push(c),this.dataCache=null},isDark:function(a,b){if(0>a||this.moduleCount<=a||0>b||this.moduleCount<=b)throw new Error(a+","+b);return this.modules[a][b]},getModuleCount:function(){return this.moduleCount},make:function(){this.makeImpl(!1,this.getBestMaskPattern())},makeImpl:function(a,c){this.moduleCount=4*this.typeNumber+17,this.modules=new Array(this.moduleCount);for(var d=0;d<this.moduleCount;d++){this.modules[d]=new Array(this.moduleCount);for(var e=0;e<this.moduleCount;e++)this.modules[d][e]=null}this.setupPositionProbePattern(0,0),this.setupPositionProbePattern(this.moduleCount-7,0),this.setupPositionProbePattern(0,this.moduleCount-7),this.setupPositionAdjustPattern(),this.setupTimingPattern(),this.setupTypeInfo(a,c),this.typeNumber>=7&&this.setupTypeNumber(a),null==this.dataCache&&(this.dataCache=b.createData(this.typeNumber,this.errorCorrectLevel,this.dataList)),this.mapData(this.dataCache,c)},setupPositionProbePattern:function(a,b){for(var c=-1;7>=c;c++)if(!(-1>=a+c||this.moduleCount<=a+c))for(var d=-1;7>=d;d++)-1>=b+d||this.moduleCount<=b+d||(this.modules[a+c][b+d]=c>=0&&6>=c&&(0==d||6==d)||d>=0&&6>=d&&(0==c||6==c)||c>=2&&4>=c&&d>=2&&4>=d?!0:!1)},getBestMaskPattern:function(){for(var a=0,b=0,c=0;8>c;c++){this.makeImpl(!0,c);var d=f.getLostPoint(this);(0==c||a>d)&&(a=d,b=c)}return b},setupTimingPattern:function(){for(var a=8;a<this.moduleCount-8;a++)null==this.modules[a][6]&&(this.modules[a][6]=0==a%2);for(var b=8;b<this.moduleCount-8;b++)null==this.modules[6][b]&&(this.modules[6][b]=0==b%2)},setupPositionAdjustPattern:function(){for(var a=f.getPatternPosition(this.typeNumber),b=0;b<a.length;b++)for(var c=0;c<a.length;c++){var d=a[b],e=a[c];if(null==this.modules[d][e])for(var g=-2;2>=g;g++)for(var h=-2;2>=h;h++)this.modules[d+g][e+h]=-2==g||2==g||-2==h||2==h||0==g&&0==h?!0:!1}},setupTypeNumber:function(a){for(var b=f.getBCHTypeNumber(this.typeNumber),c=0;18>c;c++)this.modules[Math.floor(c/3)][c%3+this.moduleCount-8-3]=!a&&1==(1&b>>c);for(var c=0;18>c;c++)this.modules[c%3+this.moduleCount-8-3][Math.floor(c/3)]=!a&&1==(1&b>>c)},setupTypeInfo:function(a,b){for(var c=this.errorCorrectLevel<<3|b,d=f.getBCHTypeInfo(c),e=0;15>e;e++){var g=!a&&1==(1&d>>e);6>e?this.modules[e][8]=g:8>e?this.modules[e+1][8]=g:this.modules[this.moduleCount-15+e][8]=g}for(var e=0;15>e;e++){var g=!a&&1==(1&d>>e);8>e?this.modules[8][this.moduleCount-e-1]=g:9>e?this.modules[8][15-e-1+1]=g:this.modules[8][15-e-1]=g}this.modules[this.moduleCount-8][8]=!a},mapData:function(a,b){for(var c=-1,d=this.moduleCount-1,e=7,g=0,h=this.moduleCount-1;h>0;h-=2){6==h&&h--;for(var i=0;2>i;i++)if(null==this.modules[d][h-i]){var j=!1;g<a.length&&(j=1==(1&a[g]>>>e));var k=f.getMask(b,d,h-i);k&&(j=!j),this.modules[d][h-i]=j,e--,-1==e&&(g++,e=7)}if(d+=c,0>d||this.moduleCount<=d){d-=c,c=-c;break}}}},b.PAD0=236,b.PAD1=17,b.createData=function(a,c,d){for(var e=j.getRSBlocks(a,c),g=new k,h=0;h<d.length;h++){var i=d[h];g.put(i.mode,4),g.put(i.getLength(),f.getLengthInBits(i.mode,a)),i.write(g)}for(var l=0,h=0;h<e.length;h++)l+=e[h].dataCount;if(g.getLengthInBits()>8*l)throw new Error("code length overflow. ("+g.getLengthInBits()+">"+8*l+")");for(g.getLengthInBits()+4<=8*l&&g.put(0,4);0!=g.getLengthInBits()%8;)g.putBit(!1);for(;;){if(g.getLengthInBits()>=8*l)break;if(g.put(b.PAD0,8),g.getLengthInBits()>=8*l)break;g.put(b.PAD1,8)}return b.createBytes(g,e)},b.createBytes=function(a,b){for(var c=0,d=0,e=0,g=new Array(b.length),h=new Array(b.length),j=0;j<b.length;j++){var k=b[j].dataCount,l=b[j].totalCount-k;d=Math.max(d,k),e=Math.max(e,l),g[j]=new Array(k);for(var m=0;m<g[j].length;m++)g[j][m]=255&a.buffer[m+c];c+=k;var n=f.getErrorCorrectPolynomial(l),o=new i(g[j],n.getLength()-1),p=o.mod(n);h[j]=new Array(n.getLength()-1);for(var m=0;m<h[j].length;m++){var q=m+p.getLength()-h[j].length;h[j][m]=q>=0?p.get(q):0}}for(var r=0,m=0;m<b.length;m++)r+=b[m].totalCount;for(var s=new Array(r),t=0,m=0;d>m;m++)for(var j=0;j<b.length;j++)m<g[j].length&&(s[t++]=g[j][m]);for(var m=0;m<e;m++)for(var j=0;j<b.length;j++)m<h[j].length&&(s[t++]=h[j][m]);return s};var c={MODE_NUMBER:1,MODE_ALPHA_NUM:2,MODE_8BIT_BYTE:4,MODE_KANJI:8},d={L:1,M:0,Q:3,H:2},e={PATTERN000:0,PATTERN001:1,PATTERN010:2,PATTERN011:3,PATTERN100:4,PATTERN101:5,PATTERN110:6,PATTERN111:7},f={PATTERN_POSITION_TABLE:[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],G15:1335,G18:7973,G15_MASK:21522,getBCHTypeInfo:function(a){for(var b=a<<10;f.getBCHDigit(b)-f.getBCHDigit(f.G15)>=0;)b^=f.G15<<f.getBCHDigit(b)-f.getBCHDigit(f.G15);return(a<<10|b)^f.G15_MASK},getBCHTypeNumber:function(a){for(var b=a<<12;f.getBCHDigit(b)-f.getBCHDigit(f.G18)>=0;)b^=f.G18<<f.getBCHDigit(b)-f.getBCHDigit(f.G18);return a<<12|b},getBCHDigit:function(a){for(var b=0;0!=a;)b++,a>>>=1;return b},getPatternPosition:function(a){return f.PATTERN_POSITION_TABLE[a-1]},getMask:function(a,b,c){switch(a){case e.PATTERN000:return 0==(b+c)%2;case e.PATTERN001:return 0==b%2;case e.PATTERN010:return 0==c%3;case e.PATTERN011:return 0==(b+c)%3;case e.PATTERN100:return 0==(Math.floor(b/2)+Math.floor(c/3))%2;case e.PATTERN101:return 0==b*c%2+b*c%3;case e.PATTERN110:return 0==(b*c%2+b*c%3)%2;case e.PATTERN111:return 0==(b*c%3+(b+c)%2)%2;default:throw new Error("bad maskPattern:"+a)}},getErrorCorrectPolynomial:function(a){for(var b=new i([1],0),c=0;a>c;c++)b=b.multiply(new i([1,g.gexp(c)],0));return b},getLengthInBits:function(a,b){if(b>=1&&10>b)switch(a){case c.MODE_NUMBER:return 10;case c.MODE_ALPHA_NUM:return 9;case c.MODE_8BIT_BYTE:return 8;case c.MODE_KANJI:return 8;default:throw new Error("mode:"+a)}else if(27>b)switch(a){case c.MODE_NUMBER:return 12;case c.MODE_ALPHA_NUM:return 11;case c.MODE_8BIT_BYTE:return 16;case c.MODE_KANJI:return 10;default:throw new Error("mode:"+a)}else{if(!(41>b))throw new Error("type:"+b);switch(a){case c.MODE_NUMBER:return 14;case c.MODE_ALPHA_NUM:return 13;case c.MODE_8BIT_BYTE:return 16;case c.MODE_KANJI:return 12;default:throw new Error("mode:"+a)}}},getLostPoint:function(a){for(var b=a.getModuleCount(),c=0,d=0;b>d;d++)for(var e=0;b>e;e++){for(var f=0,g=a.isDark(d,e),h=-1;1>=h;h++)if(!(0>d+h||d+h>=b))for(var i=-1;1>=i;i++)0>e+i||e+i>=b||(0!=h||0!=i)&&g==a.isDark(d+h,e+i)&&f++;f>5&&(c+=3+f-5)}for(var d=0;b-1>d;d++)for(var e=0;b-1>e;e++){var j=0;a.isDark(d,e)&&j++,a.isDark(d+1,e)&&j++,a.isDark(d,e+1)&&j++,a.isDark(d+1,e+1)&&j++,4==(0==j||4==j?1:0)&&(c+=3)}for(var d=0;b>d;d++)for(var e=0;b-6>e;e++)a.isDark(d,e)&&!a.isDark(d,e+1)&&a.isDark(d,e+2)&&a.isDark(d,e+3)&&a.isDark(d,e+4)&&!a.isDark(d,e+5)&&a.isDark(d,e+6)&&(c+=40);for(var e=0;b>e;e++)for(var d=0;b-6>d;d++)a.isDark(d,e)&&!a.isDark(d+1,e)&&a.isDark(d+2,e)&&a.isDark(d+3,e)&&a.isDark(d+4,e)&&!a.isDark(d+5,e)&&a.isDark(d+6,e)&&(c+=40);for(var k=0,e=0;b>e;e++)for(var d=0;b>d;d++)a.isDark(d,e)&&k++;c+=10*Math.abs(100*k/b/b-50)/5}},g={glog:function(a){if(1>a)throw new Error("glog("+a+")");return g.LOG_TABLE[a]},gexp:function(a){for(;0>a;)a+=255;for(;a>=256;)a-=255;return g.EXP_TABLE[a]},EXP_TABLE:new Array(256),LOG_TABLE:new Array(256)},h=0;8>h;h++)g.EXP_TABLE[h]=1<<h;for(var h=8;256>h;h++)g.EXP_TABLE[h]=g.EXP_TABLE[h-4]^g.EXP_TABLE[h-5]^g.EXP_TABLE[h-6]^g.EXP_TABLE[h-8];for(var h=0;255>h;h++)g.LOG_TABLE[g.EXP_TABLE[h]]=h;i.prototype={get:function(a){return this.num[a]},getLength:function(){return this.num.length},multiply:function(a){for(var b=new Array(this.getLength()+a.getLength()-1),c=0;c<this.getLength();c++)for(var d=0;d<a.getLength();d++)b[c+d]^=g.gexp(g.glog(this.get(c))+g.glog(a.get(d)));return new i(b,0)},mod:function(a){if(this.getLength()-a.getLength()<0)return this;for(var b=g.glog(this.get(0))-g.glog(a.get(0)),c=new Array(this.getLength()),d=0;d<this.getLength();d++)c[d]=this.get(d);for(var d=0;d<a.getLength();d++)c[d]^=g.gexp(g.glog(a.get(d))+b);return new i(c,0).mod(a)}},j.RS_BLOCK_TABLE=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16],[6,151,121,6,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[13,151,121,7,152,122]].slice(0,110).concat([[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]]),j.getRSBlocks=function(a,b){var c=j.getRsBlockTable(a,b);if(void 0==c)throw new Error("bad rs block @ typeNumber:"+a+"/errorCorrectLevel:"+b);for(var d=c.length/3,e=[],f=0;d>f;f++)for(var g=c[3*f+0],h=c[3*f+1],i=c[3*f+2],k=0;g>k;k++)e.push(new j(h,i));return e},j.getRsBlockTable=function(a,b){switch(b){case d.L:return j.RS_BLOCK_TABLE[4*(a-1)+0];case d.M:return j.RS_BLOCK_TABLE[4*(a-1)+1];case d.Q:return j.RS_BLOCK_TABLE[4*(a-1)+2];case d.H:return j.RS_BLOCK_TABLE[4*(a-1)+3];default:return void 0}},k.prototype={get:function(a){var b=Math.floor(a/8);return 1==(1&this.buffer[b]>>>7-a%8)},put:function(a,b){for(var c=0;b>c;c++)this.putBit(1==(1&a>>>b-c-1))},getLengthInBits:function(){return this.length},putBit:function(a){var b=Math.floor(this.length/8);this.buffer.length<=b&&this.buffer.push(0),a&&(this.buffer[b]|=128>>>this.length%8),this.length++}};var l=[[17,14,11,7],[32,26,20,14],[53,42,32,24],[78,62,46,34],[106,84,60,44],[134,106,74,58],[154,122,86,64],[192,152,108,84],[230,180,130,98],[271,213,151,119],[321,251,177,137],[367,287,203,155],[425,331,241,177],[458,362,258,194],[520,412,292,220],[586,450,322,250],[644,504,364,280],[718,560,394,310],[792,624,442,338],[858,666,482,382],[929,711,509,403],[1003,779,565,439],[1091,857,611,461],[1171,911,661,511],[1273,997,715,535],[1367,1059,751,593],[1465,1125,805,625],[1528,1190,868,658],[1628,1264,908,698],[1732,1370,982,742],[1840,1452,1030,790],[1952,1538,1112,842],[2068,1628,1168,898],[2188,1722,1228,958],[2303,1809,1283,983],[2431,1911,1351,1051],[2563,1989,1423,1093],[2699,2099,1499,1139],[2809,2213,1579,1219],[2953,2331,1663,1273]],o=function(){var a=function(a,b){this._el=a,this._htOption=b};return a.prototype.draw=function(a){function g(a,b){var c=document.createElementNS("http://www.w3.org/2000/svg",a);for(var d in b)b.hasOwnProperty(d)&&c.setAttribute(d,b[d]);return c}var b=this._htOption,c=this._el,d=a.getModuleCount();this.clear();var h=g("svg",{viewBox:"0 0 "+String(d)+" "+String(d),width:"100%",height:"100%",fill:b.colorLight});h.setAttributeNS("http://www.w3.org/2000/xmlns/","xmlns:xlink","http://www.w3.org/1999/xlink"),c.appendChild(h),h.appendChild(g("rect",{fill:b.colorDark,width:"1",height:"1",id:"template"}));for(var i=0;d>i;i++)for(var j=0;d>j;j++)if(a.isDark(i,j)){var k=g("use",{x:String(i),y:String(j)});k.setAttributeNS("http://www.w3.org/1999/xlink","href","#template"),h.appendChild(k)}},a.prototype.clear=function(){for(;this._el.hasChildNodes();)this._el.removeChild(this._el.lastChild)},a}(),p="svg"===document.documentElement.tagName.toLowerCase(),q=p?o:m()?function(){function a(){this._elImage.src=this._elCanvas.toDataURL("image/png"),this._elImage.style.display="block",this._elCanvas.style.display="none"}function d(a,b){var c=this;if(c._fFail=b,c._fSuccess=a,null===c._bSupportDataURI){var d=document.createElement("img"),e=function(){c._bSupportDataURI=!1,c._fFail&&_fFail.call(c)},f=function(){c._bSupportDataURI=!0,c._fSuccess&&c._fSuccess.call(c)};return d.onabort=e,d.onerror=e,d.onload=f,d.src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==",void 0}c._bSupportDataURI===!0&&c._fSuccess?c._fSuccess.call(c):c._bSupportDataURI===!1&&c._fFail&&c._fFail.call(c)}if(this._android&&this._android<=2.1){var b=1/window.devicePixelRatio,c=CanvasRenderingContext2D.prototype.drawImage;CanvasRenderingContext2D.prototype.drawImage=function(a,d,e,f,g,h,i,j){if("nodeName"in a&&/img/i.test(a.nodeName))for(var l=arguments.length-1;l>=1;l--)arguments[l]=arguments[l]*b;else"undefined"==typeof j&&(arguments[1]*=b,arguments[2]*=b,arguments[3]*=b,arguments[4]*=b);c.apply(this,arguments)}}var e=function(a,b){this._bIsPainted=!1,this._android=n(),this._htOption=b,this._elCanvas=document.createElement("canvas"),this._elCanvas.width=b.width,this._elCanvas.height=b.height,a.appendChild(this._elCanvas),this._el=a,this._oContext=this._elCanvas.getContext("2d"),this._bIsPainted=!1,this._elImage=document.createElement("img"),this._elImage.style.display="none",this._el.appendChild(this._elImage),this._bSupportDataURI=null};return e.prototype.draw=function(a){var b=this._elImage,c=this._oContext,d=this._htOption,e=a.getModuleCount(),f=d.width/e,g=d.height/e,h=Math.round(f),i=Math.round(g);b.style.display="none",this.clear();for(var j=0;e>j;j++)for(var k=0;e>k;k++){var l=a.isDark(j,k),m=k*f,n=j*g;c.strokeStyle=l?d.colorDark:d.colorLight,c.lineWidth=1,c.fillStyle=l?d.colorDark:d.colorLight,c.fillRect(m,n,f,g),c.strokeRect(Math.floor(m)+.5,Math.floor(n)+.5,h,i),c.strokeRect(Math.ceil(m)-.5,Math.ceil(n)-.5,h,i)}this._bIsPainted=!0},e.prototype.makeImage=function(){this._bIsPainted&&d.call(this,a)},e.prototype.isPainted=function(){return this._bIsPainted},e.prototype.clear=function(){this._oContext.clearRect(0,0,this._elCanvas.width,this._elCanvas.height),this._bIsPainted=!1},e.prototype.round=function(a){return a?Math.floor(1e3*a)/1e3:a},e}():function(){var a=function(a,b){this._el=a,this._htOption=b};return a.prototype.draw=function(a){for(var b=this._htOption,c=this._el,d=a.getModuleCount(),e=Math.floor(b.width/d),f=Math.floor(b.height/d),g=['<table style="border:0;border-collapse:collapse;">'],h=0;d>h;h++){g.push("<tr>");for(var i=0;d>i;i++)g.push('<td style="border:0;border-collapse:collapse;padding:0;margin:0;width:'+e+"px;height:"+f+"px;background-color:"+(a.isDark(h,i)?b.colorDark:b.colorLight)+';"></td>');g.push("</tr>")}g.push("</table>"),c.innerHTML=g.join("")},a.prototype.clear=function(){this._el.innerHTML=""},a}();QRCode=function(a,b){if(this._htOption={width:256,height:256,typeNumber:4,colorDark:"#000000",colorLight:"#ffffff",correctLevel:d.H},"string"==typeof b&&(b={text:b}),b)for(var c in b)this._htOption[c]=b[c];"string"==typeof a&&(a=document.getElementById(a)),this._android=n(),this._el=a,this._oQRCode=null,this._oDrawing=new q(this._el,this._htOption),this._htOption.text&&this.makeCode(this._htOption.text)},QRCode.prototype.makeCode=function(a){this._oQRCode=new b(r(a,this._htOption.correctLevel),this._htOption.correctLevel),this._oQRCode.addData(a),this._oQRCode.make(),this._el.title=a,this._oDrawing.draw(this._oQRCode),this.makeImage()},QRCode.prototype.clear=function(){this._oDrawing.clear()},QRCode.CorrectLevel=d}();
-
-/* 生成指向本页的二维码（仅 http(s) 环境下显示） */
+/* ============ 应用搜索过滤 ============ */
 (function () {
-  var loc = window.location;
-  var url = loc.origin + loc.pathname;
-  var el = document.getElementById('qr'),
-      urlEl = document.getElementById('url');
-  if (loc.protocol === 'http:' || loc.protocol === 'https:') {
-    try {
-      new QRCode(el, { text: url, width: 200, height: 200, correctLevel: QRCode.CorrectLevel.M, colorDark: '#111827', colorLight: '#ffffff' });
-      urlEl.textContent = url;
-    } catch (e) {
-      urlEl.textContent = url; el.style.display = 'none';
+  var input = document.getElementById('q');
+  var noRes = document.getElementById('noResult');
+  if (!input) return;
+  function run() {
+    var kw = input.value.trim().toLowerCase();
+    var sections = document.querySelectorAll('main .sect');
+    var total = 0;
+    sections.forEach(function (sec) {
+      var cards = sec.querySelectorAll('.card');
+      var shown = 0;
+      cards.forEach(function (c) {
+        var hay = (c.textContent + ' ' + (c.getAttribute('data-k') || '')).toLowerCase();
+        var hit = !kw || hay.indexOf(kw) !== -1;
+        c.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      sec.style.display = shown ? '' : 'none';
+      total += shown;
+    });
+    noRes.style.display = total ? 'none' : 'block';
+  }
+  input.addEventListener('input', run);
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { input.value = ''; run(); input.blur(); }
+  });
+})();
+
+/* ============ 人机验证：三角拼图滑块 ============ */
+(function () {
+  var W = 296, H = 180, SC = 2;
+  var canvas = document.getElementById('capCanvas');
+  var mask = document.getElementById('capMask');
+  var panel = document.getElementById('capPanel');
+  var fill = document.getElementById('capFill');
+  var thumb = document.getElementById('capThumb');
+  var hint = document.getElementById('capHint');
+  var statusEl = document.getElementById('capStatus');
+  if (!canvas || !mask) { return; }
+
+  document.body.classList.add('cap-lock');
+
+  var rand = function (a, b) { return a + Math.random() * (b - a); };
+  var PALS = [
+    ['#0b1026', '#6d28d9', '#22d3ee'],
+    ['#051626', '#1d4ed8', '#38bdf8'],
+    ['#09090f', '#b91c1c', '#f59e0b'],
+    ['#032612', '#15803d', '#a3e635']
+  ];
+  var pal = PALS[Math.floor(Math.random() * PALS.length)];
+
+  /* 背景画到离屏画布，一次成型 */
+  var bg = document.createElement('canvas');
+  bg.width = W * SC; bg.height = H * SC;
+  var bctx = bg.getContext('2d');
+  bctx.scale(SC, SC);
+  var g = bctx.createLinearGradient(0, 0, W, H);
+  g.addColorStop(0, pal[0]); g.addColorStop(0.55, pal[1]); g.addColorStop(1, pal[2]);
+  bctx.fillStyle = g; bctx.fillRect(0, 0, W, H);
+  for (var i = 0; i < 5; i++) {
+    var x = rand(0, W), y = rand(0, H), r = rand(30, 80);
+    var rg = bctx.createRadialGradient(x, y, 0, x, y, r);
+    rg.addColorStop(0, 'rgba(255,255,255,' + rand(0.10, 0.32).toFixed(3) + ')');
+    rg.addColorStop(1, 'rgba(255,255,255,0)');
+    bctx.fillStyle = rg; bctx.beginPath(); bctx.arc(x, y, r, 0, Math.PI * 2); bctx.fill();
+  }
+  for (var s = 0; s < 46; s++) {
+    bctx.globalAlpha = rand(0.15, 0.7);
+    bctx.fillStyle = '#ffffff';
+    bctx.fillRect(rand(0, W), rand(0, H), 1.3, 1.3);
+  }
+  bctx.globalAlpha = 1;
+  bctx.strokeStyle = 'rgba(255,255,255,.22)'; bctx.lineWidth = 1.4;
+  for (var l = 0; l < 3; l++) {
+    var sx = rand(0, W);
+    bctx.beginPath(); bctx.moveTo(sx, H + 10);
+    bctx.bezierCurveTo(sx - 60, rand(40, H - 40), sx + 60, rand(40, H - 40), sx + rand(-90, 90), -10);
+    bctx.stroke();
+  }
+
+  /* 三角缺口参数 */
+  var S = 38;
+  var INIT_X = 34;
+  var hcx = rand(150, W - S / 2 - 12);
+  var hcy = rand(S / 2 + 12, H - S / 2 - 12);
+  var rot = rand(0, Math.PI * 2);
+  var curX = INIT_X, dragging = false, startX = 0, done = false;
+  var TOL = 11;
+  var MAX_X = W - S / 2 - 10;
+
+  function triPath(c, cx, cy, sz, rr) {
+    c.beginPath();
+    for (var k = 0; k < 3; k++) {
+      var a = rr + k * Math.PI * 2 / 3;
+      var px = cx + (sz / 2) * Math.cos(a);
+      var py = cy + (sz / 2) * Math.sin(a);
+      if (k === 0) { c.moveTo(px, py); } else { c.lineTo(px, py); }
     }
-  } else {
-    el.style.display = 'none';
-    urlEl.textContent = '本页当前以 file:// 方式打开，请用下方服务器命令在浏览器访问';
+    c.closePath();
   }
-  /* 直接给出两个 APK 的绝对地址，方便复制 */
-  /* 在 Pages 环境提示局域网备用地址 */
-  if (loc.protocol === 'http:' && (loc.hostname === 'localhost' || loc.hostname.startsWith('192.168.') || loc.hostname.startsWith('10.'))) {
-    var lan = document.getElementById('lan');
-    if (lan) lan.textContent = loc.host + ' (本机服务)';
+
+  function render(px) {
+    canvas.width = W * SC; canvas.height = H * SC;
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(SC, 0, 0, SC, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    ctx.drawImage(bg, 0, 0, bg.width, bg.height, 0, 0, W, H);
+    /* 缺口阴影 */
+    ctx.save();
+    triPath(ctx, hcx, hcy, S, rot);
+    ctx.fillStyle = 'rgba(8,10,20,.55)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 1.6; ctx.stroke();
+    ctx.restore();
+    /* 碎片：从缺口处抠出背景，平移绘制 */
+    ctx.save();
+    triPath(ctx, px, hcy, S, rot);
+    ctx.clip();
+    ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 3;
+    ctx.translate(px - hcx, 0);
+    ctx.drawImage(bg, 0, 0, bg.width, bg.height, 0, 0, W, H);
+    ctx.restore();
+    if (done) {
+      ctx.save();
+      triPath(ctx, px, hcy, S, rot);
+      ctx.fillStyle = 'rgba(34,197,94,.28)'; ctx.fill();
+      ctx.strokeStyle = 'rgba(134,239,172,.95)'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.restore();
+    }
   }
+  render(curX);
+
+  function setThumb(px) {
+    var t = Math.max(0, Math.min(1, (px - INIT_X) / (MAX_X - INIT_X)));
+    var travel = 255;
+    var tx = t * travel;
+    fill.style.width = (tx + 3) + 'px';
+    thumb.style.left = (tx + 3) + 'px';
+  }
+  setThumb(curX);
+
+  var pX = function (e) { return e.touches && e.touches.length ? e.touches[0].clientX : e.clientX; };
+  thumb.addEventListener('pointerdown', function (e) {
+    if (done) { return; }
+    dragging = true; startX = pX(e) - curX;
+    hint.classList.add('hide');
+    statusEl.textContent = ''; statusEl.className = 'cap-status';
+    try { thumb.setPointerCapture(e.pointerId); } catch (err) { }
+    e.preventDefault();
+  });
+  window.addEventListener('pointermove', function (e) {
+    if (!dragging || done) { return; }
+    curX = Math.max(INIT_X, Math.min(MAX_X, pX(e) - startX));
+    setThumb(curX); render(curX);
+  });
+  window.addEventListener('pointerup', function () {
+    if (!dragging || done) { return; }
+    dragging = false;
+    if (Math.abs(curX - hcx) <= TOL) {
+      done = true; curX = hcx;
+      setThumb(MAX_X);
+      render(hcx);
+      fill.classList.add('ok'); thumb.classList.add('ok'); thumb.textContent = '✔';
+      statusEl.textContent = '✔ 验证成功 · 欢迎回来，人类';
+      statusEl.className = 'cap-status ok';
+      document.body.classList.remove('cap-lock');
+      setTimeout(function () { mask.classList.add('hidden'); }, 750);
+    } else {
+      statusEl.textContent = '✖ 没对准缺口，再拖一次试试';
+      statusEl.className = 'cap-status bad';
+      panel.classList.add('cap-shake');
+      setTimeout(function () {
+        panel.classList.remove('cap-shake');
+        curX = INIT_X; setThumb(curX); render(curX);
+      }, 420);
+    }
+  });
 })();
 </script>
 </body>

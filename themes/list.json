@@ -1,6 +1,6 @@
 {
   "updated": "2026-10-18",
-  "attribution": "主题内容源自 GPL-3.0 开源项目 FanChen-Theme-Library 及其作者公开分享的网盘资源，由流光主题整理分发。",
+  "attribution": "主题内容源自 GPL-3.0 开源项目 FanChen-Theme-Library 及其作者公开分享的网盘资源，由主题Pro整理分发。",
   "themes": [
     {
       "id": 1,
@@ -100,6 +100,15 @@
       "link": "https://www.123865.com/s/4SljVv-H3yUh",
       "extractCode": "",
       "tags": ["华为", "荣耀", "合集"]
+    },
+    {
+      "id": 12,
+      "name": "液态玻璃·精选通道",
+      "desc": "液态玻璃风格主题直达海量合集 · 免提取码",
+      "image": "ios26.jpg",
+      "link": "https://www.123865.com/s/4SljVv-H3yUh",
+      "extractCode": "",
+      "tags": ["华为", "荣耀", "液态玻璃"]
     }
   ]
 }
