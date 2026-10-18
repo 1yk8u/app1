@@ -1,0 +1,4 @@
+# 大文件走 GitHub Releases，不入库
+apks/AlistApp*.apk
+*.idsig
+*.log
