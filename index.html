@@ -186,29 +186,22 @@
   }
   .cap-panel h3 { font-size:16px; margin-bottom:4px; }
   .cap-sub { font-size:12.5px; color:var(--txt-3); margin-bottom:12px; line-height:1.6; }
-  .cap-canvas-wrap { position:relative; border-radius:14px; overflow:hidden; border:1px solid var(--line); }
-  .cap-canvas-wrap canvas { display:block; }
+  .cap-ask { margin-top:14px; padding:18px 14px; border-radius:14px; border:1px solid var(--line);
+    background:rgba(255,255,255,.05); display:flex; align-items:center; justify-content:center;
+    font-size:26px; font-weight:800; letter-spacing:3px; color:#fff; font-variant-numeric:tabular-nums; }
+  .cap-ask .cap-qmark { color:var(--ac1); margin-left:8px; }
+  .cap-row { display:flex; gap:8px; margin-top:10px; }
+  .cap-input { flex:1; height:44px; border-radius:12px; border:1px solid var(--line);
+    background:rgba(255,255,255,.06); color:#fff; font-size:16px; padding:0 14px; outline:none;
+    -webkit-text-size-adjust:100%; }
+  .cap-input:focus { border-color:var(--ac1); box-shadow:0 0 0 3px rgba(99,102,241,.25); }
+  .cap-btn { height:44px; padding:0 20px; border-radius:12px; border:none; cursor:pointer;
+    background:linear-gradient(135deg,var(--ac1),var(--ac2)); color:#fff; font-size:14px;
+    font-weight:700; flex-shrink:0; }
+  .cap-btn:active { transform:scale(.97); }
   .cap-shake { animation:capShake .4s; }
   @keyframes capShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
-  .cap-track {
-    position:relative; margin-top:14px; height:42px; border-radius:999px;
-    background:rgba(255,255,255,.06); border:1px solid var(--line); overflow:hidden;
-  }
-  .cap-fill { position:absolute; inset:0; width:0; background:linear-gradient(90deg,rgba(99,102,241,.35),rgba(139,92,246,.5)); }
-  .cap-fill.ok { background:linear-gradient(90deg,rgba(34,197,94,.45),rgba(34,197,94,.7)); }
-  .cap-thumb {
-    position:absolute; top:3px; left:3px; width:36px; height:36px; border-radius:999px;
-    background:linear-gradient(135deg,var(--ac1),var(--ac2));
-    display:flex; align-items:center; justify-content:center; color:#fff; font-size:15px;
-    cursor:grab; touch-action:none; user-select:none; box-shadow:0 6px 16px rgba(0,0,0,.4);
-  }
-  .cap-thumb.ok { background:linear-gradient(135deg,#22c55e,#16a34a); cursor:default; }
-  .cap-hint {
-    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    font-size:12.5px; color:var(--txt-2); pointer-events:none;
-  }
-  .cap-hint.hide { display:none; }
-  .cap-status { margin-top:10px; font-size:12.5px; min-height:18px; text-align:center; }
+  .cap-status { margin-top:12px; font-size:12.5px; min-height:18px; text-align:center; }
   .cap-status.ok { color:var(--ok); }
   .cap-status.bad { color:var(--bad); }
 
@@ -636,12 +629,12 @@
 <div class="cap-mask" id="capMask">
   <div class="cap-panel" id="capPanel">
     <h3>🧠 人机验证</h3>
-    <div class="cap-sub">拖动滑块，把三角碎片拼回缺口 —— 证明屏幕前是人类，不是爬虫。</div>
-    <div class="cap-canvas-wrap"><canvas id="capCanvas"></canvas></div>
-    <div class="cap-track">
-      <div class="cap-fill" id="capFill"></div>
-      <div class="cap-thumb" id="capThumb">▶</div>
-      <div class="cap-hint" id="capHint">按住我，拖到三角缺口上</div>
+    <div class="cap-sub">答对这道题就能进 —— 证明屏幕前是人类，不是爬虫。</div>
+    <div class="cap-ask">1 + 1 = <span class="cap-qmark">?</span></div>
+    <div class="cap-row">
+      <input id="capAns" class="cap-input" type="text" inputmode="numeric" maxlength="4"
+             autocomplete="off" placeholder="输入答案">
+      <button id="capGo" class="cap-btn" type="button">验证</button>
     </div>
     <div class="cap-status" id="capStatus"></div>
   </div>
@@ -677,154 +670,41 @@
   });
 })();
 
-/* ============ 人机验证：三角拼图滑块 ============ */
+/* ============ 人机验证：1+1 极简问答 ============ */
 (function () {
-  var W = 296, H = 180, SC = 2;
-  var canvas = document.getElementById('capCanvas');
   var mask = document.getElementById('capMask');
   var panel = document.getElementById('capPanel');
-  var fill = document.getElementById('capFill');
-  var thumb = document.getElementById('capThumb');
-  var hint = document.getElementById('capHint');
+  var capInput = document.getElementById('capAns');
+  var capGo = document.getElementById('capGo');
   var statusEl = document.getElementById('capStatus');
-  if (!canvas || !mask) { return; }
+  if (!mask || !capInput) { return; }
 
   document.body.classList.add('cap-lock');
 
-  var rand = function (a, b) { return a + Math.random() * (b - a); };
-  var PALS = [
-    ['#0b1026', '#6d28d9', '#22d3ee'],
-    ['#051626', '#1d4ed8', '#38bdf8'],
-    ['#09090f', '#b91c1c', '#f59e0b'],
-    ['#032612', '#15803d', '#a3e635']
-  ];
-  var pal = PALS[Math.floor(Math.random() * PALS.length)];
-
-  /* 背景画到离屏画布，一次成型 */
-  var bg = document.createElement('canvas');
-  bg.width = W * SC; bg.height = H * SC;
-  var bctx = bg.getContext('2d');
-  bctx.scale(SC, SC);
-  var g = bctx.createLinearGradient(0, 0, W, H);
-  g.addColorStop(0, pal[0]); g.addColorStop(0.55, pal[1]); g.addColorStop(1, pal[2]);
-  bctx.fillStyle = g; bctx.fillRect(0, 0, W, H);
-  for (var i = 0; i < 5; i++) {
-    var x = rand(0, W), y = rand(0, H), r = rand(30, 80);
-    var rg = bctx.createRadialGradient(x, y, 0, x, y, r);
-    rg.addColorStop(0, 'rgba(255,255,255,' + rand(0.10, 0.32).toFixed(3) + ')');
-    rg.addColorStop(1, 'rgba(255,255,255,0)');
-    bctx.fillStyle = rg; bctx.beginPath(); bctx.arc(x, y, r, 0, Math.PI * 2); bctx.fill();
+  function pass() {
+    capInput.disabled = true; capGo.disabled = true;
+    statusEl.textContent = '✔ 验证成功 · 欢迎回来，人类';
+    statusEl.className = 'cap-status ok';
+    document.body.classList.remove('cap-lock');
+    setTimeout(function () { mask.classList.add('hidden'); }, 750);
   }
-  for (var s = 0; s < 46; s++) {
-    bctx.globalAlpha = rand(0.15, 0.7);
-    bctx.fillStyle = '#ffffff';
-    bctx.fillRect(rand(0, W), rand(0, H), 1.3, 1.3);
+  function fail() {
+    statusEl.textContent = '✖ 不对哦，再想想 —— 两个 1 相加';
+    statusEl.className = 'cap-status bad';
+    panel.classList.add('cap-shake');
+    capInput.value = '';
+    setTimeout(function () { panel.classList.remove('cap-shake'); capInput.focus(); }, 420);
   }
-  bctx.globalAlpha = 1;
-  bctx.strokeStyle = 'rgba(255,255,255,.22)'; bctx.lineWidth = 1.4;
-  for (var l = 0; l < 3; l++) {
-    var sx = rand(0, W);
-    bctx.beginPath(); bctx.moveTo(sx, H + 10);
-    bctx.bezierCurveTo(sx - 60, rand(40, H - 40), sx + 60, rand(40, H - 40), sx + rand(-90, 90), -10);
-    bctx.stroke();
+  function check() {
+    if (capInput.disabled) { return; }
+    var v = capInput.value.trim();
+    if (v === '2' || v === '二' || v === '两') { pass(); } else { fail(); }
   }
-
-  /* 三角缺口参数 */
-  var S = 38;
-  var INIT_X = 34;
-  var hcx = rand(150, W - S / 2 - 12);
-  var hcy = rand(S / 2 + 12, H - S / 2 - 12);
-  var rot = rand(0, Math.PI * 2);
-  var curX = INIT_X, dragging = false, startX = 0, done = false;
-  var TOL = 11;
-  var MAX_X = W - S / 2 - 10;
-
-  function triPath(c, cx, cy, sz, rr) {
-    c.beginPath();
-    for (var k = 0; k < 3; k++) {
-      var a = rr + k * Math.PI * 2 / 3;
-      var px = cx + (sz / 2) * Math.cos(a);
-      var py = cy + (sz / 2) * Math.sin(a);
-      if (k === 0) { c.moveTo(px, py); } else { c.lineTo(px, py); }
-    }
-    c.closePath();
-  }
-
-  function render(px) {
-    canvas.width = W * SC; canvas.height = H * SC;
-    var ctx = canvas.getContext('2d');
-    ctx.setTransform(SC, 0, 0, SC, 0, 0);
-    ctx.clearRect(0, 0, W, H);
-    ctx.drawImage(bg, 0, 0, bg.width, bg.height, 0, 0, W, H);
-    /* 缺口阴影 */
-    ctx.save();
-    triPath(ctx, hcx, hcy, S, rot);
-    ctx.fillStyle = 'rgba(8,10,20,.55)'; ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 1.6; ctx.stroke();
-    ctx.restore();
-    /* 碎片：从缺口处抠出背景，平移绘制 */
-    ctx.save();
-    triPath(ctx, px, hcy, S, rot);
-    ctx.clip();
-    ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 3;
-    ctx.translate(px - hcx, 0);
-    ctx.drawImage(bg, 0, 0, bg.width, bg.height, 0, 0, W, H);
-    ctx.restore();
-    if (done) {
-      ctx.save();
-      triPath(ctx, px, hcy, S, rot);
-      ctx.fillStyle = 'rgba(34,197,94,.28)'; ctx.fill();
-      ctx.strokeStyle = 'rgba(134,239,172,.95)'; ctx.lineWidth = 2; ctx.stroke();
-      ctx.restore();
-    }
-  }
-  render(curX);
-
-  function setThumb(px) {
-    var t = Math.max(0, Math.min(1, (px - INIT_X) / (MAX_X - INIT_X)));
-    var travel = 255;
-    var tx = t * travel;
-    fill.style.width = (tx + 3) + 'px';
-    thumb.style.left = (tx + 3) + 'px';
-  }
-  setThumb(curX);
-
-  var pX = function (e) { return e.touches && e.touches.length ? e.touches[0].clientX : e.clientX; };
-  thumb.addEventListener('pointerdown', function (e) {
-    if (done) { return; }
-    dragging = true; startX = pX(e) - curX;
-    hint.classList.add('hide');
-    statusEl.textContent = ''; statusEl.className = 'cap-status';
-    try { thumb.setPointerCapture(e.pointerId); } catch (err) { }
-    e.preventDefault();
+  capGo.addEventListener('click', check);
+  capInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); check(); }
   });
-  window.addEventListener('pointermove', function (e) {
-    if (!dragging || done) { return; }
-    curX = Math.max(INIT_X, Math.min(MAX_X, pX(e) - startX));
-    setThumb(curX); render(curX);
-  });
-  window.addEventListener('pointerup', function () {
-    if (!dragging || done) { return; }
-    dragging = false;
-    if (Math.abs(curX - hcx) <= TOL) {
-      done = true; curX = hcx;
-      setThumb(MAX_X);
-      render(hcx);
-      fill.classList.add('ok'); thumb.classList.add('ok'); thumb.textContent = '✔';
-      statusEl.textContent = '✔ 验证成功 · 欢迎回来，人类';
-      statusEl.className = 'cap-status ok';
-      document.body.classList.remove('cap-lock');
-      setTimeout(function () { mask.classList.add('hidden'); }, 750);
-    } else {
-      statusEl.textContent = '✖ 没对准缺口，再拖一次试试';
-      statusEl.className = 'cap-status bad';
-      panel.classList.add('cap-shake');
-      setTimeout(function () {
-        panel.classList.remove('cap-shake');
-        curX = INIT_X; setThumb(curX); render(curX);
-      }, 420);
-    }
-  });
+  setTimeout(function () { capInput.focus(); }, 350);
 })();
 </script>
 </body>
