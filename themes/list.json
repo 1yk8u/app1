@@ -1,0 +1,105 @@
+{
+  "updated": "2026-10-18",
+  "attribution": "主题内容源自 GPL-3.0 开源项目 FanChen-Theme-Library 及其作者公开分享的网盘资源，由流光主题整理分发。",
+  "themes": [
+    {
+      "id": 1,
+      "name": "拟态白昼",
+      "desc": "清新拟态风 · 提取码自动复制",
+      "image": "ntbz.jpg",
+      "link": "https://sss00001.lanzoui.com/b007t4sx3g",
+      "extractCode": "YJDD",
+      "tags": ["华为", "荣耀"]
+    },
+    {
+      "id": 2,
+      "name": "寰宇NEXT 3.0主题",
+      "desc": "提取码自动复制",
+      "image": "hm.png",
+      "link": "https://www.123912.com/s/FtDojv-WzGFv?",
+      "extractCode": "1rWT",
+      "tags": ["华为", "荣耀"]
+    },
+    {
+      "id": 3,
+      "name": "月球一镜到底主题",
+      "desc": "提取码自动复制",
+      "image": "yq.jpg",
+      "link": "https://sss00001.lanzoui.com/b007t4sx3g",
+      "extractCode": "YJDD",
+      "tags": ["华为", "荣耀"]
+    },
+    {
+      "id": 4,
+      "name": "鸿果26 Pro",
+      "desc": "提取码自动复制 · 仿苹果风",
+      "image": "ios26.jpg",
+      "link": "https://sss00001.lanzoui.com/b007tsec1i",
+      "extractCode": "HG26",
+      "tags": ["华为", "荣耀", "仿苹果风"]
+    },
+    {
+      "id": 5,
+      "name": "警鸿-凡尘版V3主题",
+      "desc": "警务风格 · 提取码自动复制",
+      "image": "jingwu.jpg",
+      "link": "https://www.123865.com/s/FtDojv-s7MFv?",
+      "extractCode": "8E0N",
+      "tags": ["华为", "荣耀"]
+    },
+    {
+      "id": 6,
+      "name": "土星一镜到底主题",
+      "desc": "行星主题 · 提取码自动复制",
+      "image": "tuxing.jpg",
+      "link": "https://sss00001.lanzoui.com/b007t4sx3g",
+      "extractCode": "YJDD",
+      "tags": ["华为", "荣耀"]
+    },
+    {
+      "id": 7,
+      "name": "火星一镜到底主题",
+      "desc": "行星主题 · 提取码自动复制",
+      "image": "huoxing.jpg",
+      "link": "https://sss00001.lanzoui.com/b007t4sx3g",
+      "extractCode": "YJDD",
+      "tags": ["华为", "荣耀"]
+    },
+    {
+      "id": 8,
+      "name": "少女OS",
+      "desc": "提取码自动复制 · 仿苹果风",
+      "image": "shonu26.jpg",
+      "link": "https://www.123865.com/s/FtDojv-8sMFv?",
+      "extractCode": "Ovv2",
+      "tags": ["华为", "荣耀", "仿苹果风"]
+    },
+    {
+      "id": 9,
+      "name": "华果主题",
+      "desc": "by 曾相见cxj · 仿苹果风",
+      "image": "HPOS.jpg",
+      "link": "https://wwr.lanzoui.com/b00rnx9uxc",
+      "extractCode": "4cy4",
+      "tags": ["华为", "荣耀", "仿苹果风"]
+    },
+    {
+      "id": 10,
+      "name": "鸿果 18 Pro主题",
+      "desc": "提取码自动复制 · 仿苹果风",
+      "image": "hg18.png",
+      "link": "https://sss00001.lanzoui.com/b007t3tu8d",
+      "extractCode": "HG18",
+      "tags": ["华为", "荣耀", "仿苹果风"]
+    },
+    {
+      "id": 11,
+      "name": "第三方海量主题合集",
+      "desc": "海量 .hwt/.hnt 稳定汇总 · 长期更新 · 免提取码",
+      "image": "hm.png",
+      "link": "https://www.123865.com/s/4SljVv-H3yUh",
+      "extractCode": "",
+      "tags": ["华为", "荣耀", "合集"]
+    }
+  ]
+}
